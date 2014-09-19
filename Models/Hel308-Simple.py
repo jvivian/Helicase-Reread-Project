@@ -6,7 +6,7 @@ Hel308-Simple.py is a collection of functions that perform the following operati
     
     1.  Builds a profile from an external data file
     2.  Builds a Hidden Markov Model (HMM) from the profile data
-    3.  Parses an .ABF file (nanopore data) in order to iterate through discreet events
+    3.  Parses an .ABF file (nanopore data) in order to iterate through discrete events
     4.  Events are passed through the HMM to return a comprehensive Viterbi path.
     5.  Additional information culled from the Forward-Backward algorithm is also displayed
     6.  Plots the segmented event, the event as colored by HMM-board, and the emission probabilities 
@@ -105,14 +105,14 @@ def Hel308_simple_model( distributions, name, fourmers, low=0, high=90 ):
             model.add_model( board )
 
             ## Reread Contigency ################################
-            if step_count in [0,5]:								#
-                model.add_transition (reread, match, 0.4)		#
-            if step_count in [2,3]:								#
-                model.add_transition (reread, match, 0.07)		#
-            if step_count in [4]:								#
-                model.add_transition (reread, match, 0.06)		#
-            if step_count in xrange(21,31):					    #
-                model.add_transition (match, reread, 0.02 )		#
+            if step_count in [0,5]:                             #
+                model.add_transition (reread, match, 0.4)       #
+            if step_count in [2,3]:                             #
+                model.add_transition (reread, match, 0.07)      #
+            if step_count in [4]:                               #
+                model.add_transition (reread, match, 0.06)      #
+            if step_count in xrange(21,31):                     #
+                model.add_transition (match, reread, 0.02 )     #
             ## Reread Contigency ################################
             
             if i == 0:
@@ -157,14 +157,14 @@ def Hel308_simple_model( distributions, name, fourmers, low=0, high=90 ):
                 boards.append ( board )
                 
                 ## Reread Contigency ################################
-                if step_count in [0,5]:								#
-                    model.add_transition (reread, match, 0.4)		#
-                if step_count in [2,3]:								#
-                    model.add_transition (reread, match, 0.07)		#
-                if step_count in [4]:								#
-                    model.add_transition (reread, match, 0.06)		#
-                if step_count in xrange(21,31):					    #
-                    model.add_transition (match, reread, 0.02 )		#
+                if step_count in [0,5]:                             #
+                    model.add_transition (reread, match, 0.4)       #
+                if step_count in [2,3]:                             #
+                    model.add_transition (reread, match, 0.07)      #
+                if step_count in [4]:                               #
+                    model.add_transition (reread, match, 0.06)      #
+                if step_count in xrange(21,31):                     #
+                    model.add_transition (match, reread, 0.02 )     #
                 ## Reread Contigency ################################
             
                 if isinstance( distributions[i-1], dict ):
@@ -222,7 +222,7 @@ def build_profile( ):
     Profile is stored as a list of distributions with forks represented by dictionaries.
     '''
     profile, dists = [], {}
-    data = pd.read_excel( 'CCGG.xlsx', 'Sheet3' )
+    data = pd.read_excel( '../profile/CCGG.xlsx', 'Sheet3' )
 
     total_means, total_stds = data.mean(axis=0), data.std(axis=0) # Total Profile Man
     total = [ NormalDistribution( m, 1.5 ) for m, s in zip( total_means, total_stds) ]
@@ -382,8 +382,8 @@ def analyze_event(model, event, trans):
     data[ 'mC' ] = min( [ trans[ indices[name] ].sum() for name in mC_fork ] )
     data[ 'hmC' ] = min( [ trans[ indices[name] ].sum() for name in hmC_fork ] )
 
-    data[ 'C-tag' ] = min( [ trans[ indices[name] ].sum() for name in C_tag ] )
     data[ 'mC-tag' ] = min( [ trans[ indices[name] ].sum() for name in mC_tag ] )
+    data[ 'C-tag' ] = min( [ trans[ indices[name] ].sum() for name in C_tag ] )
     data[ 'hmC-tag' ] = min( [ trans[ indices[name] ].sum() for name in hmC_tag ] )
 
     ## Score
@@ -521,8 +521,11 @@ def segment_ems_plot( model, event, ems):
     plt.tight_layout()
     plt.show()	
  
-def trans_plot( trans_dict ):
+def trans_plot( trans_dict ): ## Not working 
     '''
+    Creates a plot showing where certain events occur in relation to the states in the model
+    
+    NOT WORKING
     '''
 
     plt.subplot( 411 )
@@ -556,12 +559,12 @@ def trans_plot( trans_dict ):
  
 print '\n-=Building Profile=-'
 distributions, fourmers = build_profile()
-
+'''
 print '-=Building HMM=-'
 model = Hel308_simple_model( distributions, 'Test-31', fourmers )
 
 print '-=Parsing ABF=-'
-for event in parse_abf('abfs\\Mixed\\14710002-s01.abf', 735):
+for event in parse_abf('..\..\abfs\\Mixed\\14710002-s01.abf', 735):
     
     print '-=Determining Viterbi Path=-'
     viterbi(model, event, fourmers)
@@ -576,12 +579,13 @@ for event in parse_abf('abfs\\Mixed\\14710002-s01.abf', 735):
     ## Plots
     segment_ems_plot( model, event, ems)   
     
-    model.write( sys.stdout )
-
+    This is how to SAVE the HMM after you've created it
+    with open( 'test.txt', 'w' ) as file:
+        model.write( file )
+    '''
 '''
-Change-Log 
+Change-Log (Semantic Versioning:  Major-Minor-Patch)
 
-(Semantic Versioning:  Major-Minor-Patch)
 Version 0.1.0       -       9-18-14
-
+    1. Initial Commit
 '''

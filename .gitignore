@@ -2,3 +2,6 @@
 
 # Ignoring profile data
 *.xlsx
+
+# Ignoring ABF filess
+*.abf
