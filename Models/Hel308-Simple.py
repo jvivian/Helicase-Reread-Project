@@ -222,7 +222,7 @@ def build_profile( ):
     Profile is stored as a list of distributions with forks represented by dictionaries.
     '''
     profile, dists = [], {}
-    data = pd.read_excel( '../profile/CCGG.xlsx', 'Sheet3' )
+    data = pd.read_excel( '../Profile/CCGG.xlsx', 'Sheet3' )
 
     total_means, total_stds = data.mean(axis=0), data.std(axis=0) # Total Profile Man
     total = [ NormalDistribution( m, 1.5 ) for m, s in zip( total_means, total_stds) ]
@@ -559,7 +559,7 @@ def trans_plot( trans_dict ): ## Not working
  
 print '\n-=Building Profile=-'
 distributions, fourmers = build_profile()
-'''
+
 print '-=Building HMM=-'
 model = Hel308_simple_model( distributions, 'Test-31', fourmers )
 
@@ -578,14 +578,17 @@ for event in parse_abf('..\..\abfs\\Mixed\\14710002-s01.abf', 735):
 
     ## Plots
     segment_ems_plot( model, event, ems)   
-    
-    This is how to SAVE the HMM after you've created it
+    '''
+    This is how to SAVE the HMM after you've created/trained it
     with open( 'test.txt', 'w' ) as file:
         model.write( file )
     '''
+
 '''
 Change-Log (Semantic Versioning:  Major-Minor-Patch)
 
+
+Version 0.1.1       -       9-19-14
 Version 0.1.0       -       9-18-14
     1. Initial Commit
 '''
