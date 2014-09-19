@@ -12,7 +12,6 @@ import numpy as np
 
 ################################
 
-
 total_diff = []
 dist = {}
 
@@ -27,7 +26,6 @@ for name, frame in data.groupby( 'label' ):
 C_mC = np.abs( dist['C'] - dist['mC'] ).tolist()
 mC_hmC = np.abs( dist['mC'] - dist['hmC'] ).tolist()
 C_hmC = np.abs( dist['C'] - dist['hmC'] ).tolist()
-
 
 ## Create total comparisons 
 total = zip( dist['C'], dist['mC'], dist['hmC'] )
