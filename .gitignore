@@ -1,0 +1,4 @@
+# Below are git-ignored files
+
+# Ignoring profile data
+*.xlsx
