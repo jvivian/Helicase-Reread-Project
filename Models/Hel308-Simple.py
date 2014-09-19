@@ -564,7 +564,7 @@ print '-=Building HMM=-'
 model = Hel308_simple_model( distributions, 'Test-31', fourmers )
 
 print '-=Parsing ABF=-'
-for event in parse_abf('..\..\abfs\\Mixed\\14710002-s01.abf', 735):
+for event in parse_abf('../Data/Mixed/14710002-s01.abf', 735):
     
     print '-=Determining Viterbi Path=-'
     viterbi(model, event, fourmers)
@@ -588,7 +588,7 @@ for event in parse_abf('..\..\abfs\\Mixed\\14710002-s01.abf', 735):
 Change-Log (Semantic Versioning:  Major-Minor-Patch)
 
 
-Version 0.1.1       -       9-19-14
+Version 0.1.2       -       9-19-14
 Version 0.1.0       -       9-18-14
     1. Initial Commit
 '''

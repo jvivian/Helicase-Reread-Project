@@ -61,5 +61,10 @@ cb = plt.colorbar()
 cb.set_label('Mean Difference', labelpad=20, fontsize='16')
 plt.show()
 
+'''
+Change-Log (Semantic Versioning:  Major-Minor-Patch)
 
+Version 0.1.0       -       9-19-14
+    1. Initial Commit
+'''
 
