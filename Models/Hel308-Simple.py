@@ -344,7 +344,7 @@ def analyze_event(model, event, trans):
     hmC_fork = []; hmC_tag = []
 
     ## Parse 'temp' lists fork/tag lists
-    for i in xrange(7,12):  # (6-10) = (7-11) because of I0 insert state.
+    for i in xrange(8,11):  # (6-10) = (7-11).  Changed to 8-10 given heatmap results.
         for match in temp_C:
             if ':'+str(i) in match:
                 C_fork.append(match)
@@ -354,7 +354,7 @@ def analyze_event(model, event, trans):
         for match in temp_hmC:
             if ':'+str(i) in match:
                 hmC_fork.append(match)
-                        
+
     for i in xrange(17,22):	# (16-20) = (17-21) because of I0 insert state.
         for match in temp_C:
             if str(i) in match:
@@ -365,7 +365,7 @@ def analyze_event(model, event, trans):
         for match in temp_hmC:
             if str(i) in match:
                 hmC_tag.append(match)
-                
+    
     ## Create a dictionary that will hold the computed values
     data = {}
     data['C'] = []
