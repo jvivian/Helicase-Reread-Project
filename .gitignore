@@ -5,3 +5,4 @@
 
 # Ignoring ABF filess
 *.abf
+*.tmp
