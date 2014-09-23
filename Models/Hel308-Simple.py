@@ -40,11 +40,11 @@ def Hel308_simple_model( distributions, name, fourmers, low=0, high=90 ):
         
         ## Transitions
         # S1
-        board.add_transition( board.s1, delete,     0.05 )
-        board.add_transition( board.s1, match,      0.95 )
+        board.add_transition( board.s1, delete,     0.01 )
+        board.add_transition( board.s1, match,      0.99 )
         # S2
-        board.add_transition( board.s2, delete,     0.05 )
-        board.add_transition( board.s2, match,      0.95 )
+        board.add_transition( board.s2, delete,     0.01 )
+        board.add_transition( board.s2, match,      0.99 )
         ## Backslip / Dissocation
         # E3
         board.add_transition( board.e3, board.s4,   0.746 )
@@ -74,15 +74,15 @@ def Hel308_simple_model( distributions, name, fourmers, low=0, high=90 ):
         board.add_transition( insert, board.e2,     0.40 )
         ## Match
         if step_count in xrange( 21, 31 ):
-            board.add_transition( match, match,         0.14 )
-            board.add_transition( match, board.e2,      0.80 )
+            board.add_transition( match, match,         0.24 )
+            board.add_transition( match, board.e2,      0.70 )
             board.add_transition( match, insert,        0.02 )
             board.add_transition( match, board.s3,      0.02 )
         else:
-            board.add_transition( match, match,         0.16 )
-            board.add_transition( match, board.e2,      0.80 )
-            board.add_transition( match, insert,        0.02 )
-            board.add_transition( match, board.s3,      0.02 )
+            board.add_transition( match, match,         0.25 )
+            board.add_transition( match, board.e2,      0.70 )
+            board.add_transition( match, insert,        0.045 )
+            board.add_transition( match, board.s3,      0.005 )
     
         return board, match
     
@@ -564,7 +564,7 @@ print '-=Building HMM=-'
 model = Hel308_simple_model( distributions, 'Test-31', fourmers )
 
 print '-=Parsing ABF=-'
-for event in parse_abf('../Data/Mixed/14710002-s01.abf', 735):
+for event in parse_abf('../Data/Mixed/14710002-s01.abf', 123, 124):
     
     print '-=Determining Viterbi Path=-'
     viterbi(model, event, fourmers)
