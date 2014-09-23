@@ -81,8 +81,8 @@ def Hel308_simple_model( distributions, name, fourmers, low=0, high=90 ):
         else:
             board.add_transition( match, match,         0.25 )
             board.add_transition( match, board.e2,      0.70 )
-            board.add_transition( match, insert,        0.045 )
-            board.add_transition( match, board.s3,      0.005 )
+            board.add_transition( match, insert,        0.04 )
+            board.add_transition( match, board.s3,      0.01 )
     
         return board, match
     
