@@ -229,7 +229,8 @@ def build_profile( ):
 
     for name, frame in data.groupby('label'):
         means, stds = frame.mean(axis=0), frame.std(axis=0)
-        dists[name] = [ NormalDistribution( m, s ) for m, s in zip( means, stds )]
+        dists[name] = [ NormalDistribution( m, s ) for m, s in zip( means[:11], stds[:11] )]
+        dists[name].extend([ NormalDistribution( m, 1.5 ) for m, s in zip( means[11:], stds[11:] )])
 
     # Piecing the profile together (0-3) = states 1-4
     for i in xrange(6):
