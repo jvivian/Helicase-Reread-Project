@@ -562,20 +562,20 @@ def partition_event( model, event, ems, means ):
     for i in xrange(len(pC_all)): 
         if pC_all[i] > 0.5:         
             temp_c.append( (round(means[i],4), i) )
-        else:
+        if pC_all[i] <= 0.5:
             if temp_c:
                 temp = zip( *temp_c )
                 contexts.append( [temp[0], temp[1]] )
                 temp_c = []
-    
-    for i in xrange(len(pL_all)):
+        
         if pL_all[i] > 0.5:
             temp_l.append( (round(means[i],4), i) )
-        else:
+        if pL_all[i] <= 0.5:
             if temp_l:
                 temp = zip( *temp_l )
                 labels.append( [temp[0], temp[1]] )
                 temp_l = []
+
                 
     ## Obtain Prior for each Context ##
     p_dict = OrderedDict()
@@ -613,9 +613,10 @@ def partition_event( model, event, ems, means ):
         if pscore > 0.9:
             label_final.append( (round(pscore,4), l[0]) )
             
-    print context_final
-    print
-    print label_final
+    for i, val in enumerate(context_final):
+        print '\tContext #{} : {}'.format( i+1, val[0] )
+    for i, val in enumerate(label_final):
+        print '\tLabel #{} : {}'.format( i+1, val[0] )
     
     return context_final, label_final
         
@@ -676,7 +677,7 @@ for event in parse_abf('../Data/Mixed/'+file):
     fscore = data['Score']
     counter += 1
     if fscore > .9:
-        print 'Event #{} Fscore: {} \tat: {}'.format( counter, round(fscore,4) , round(event.start, 2) )
+        print '\nEvent #{} Fscore: {} \tat: {}'.format( counter, round(fscore,4) , round(event.start, 2) )
         contexts, labels = partition_event( full_model, event, ems, means)
         #C, L = scoring( contexts, labels, C_model, L_model )
-        break
+       
