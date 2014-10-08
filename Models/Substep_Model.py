@@ -1,8 +1,8 @@
-#!usr/bin/env 
+#!usr/bin/env python2.7
 # John Vivian
 
 '''
-Hel308-Simple.py is a collection of functions that perform the following operations:
+Substep_Model.py is a collection of functions that perform the following operations:
     
     1.  Builds a profile from an external data file
     2.  Builds a Hidden Markov Model (HMM) from the profile data
@@ -12,15 +12,17 @@ Hel308-Simple.py is a collection of functions that perform the following operati
     6.  Plots the segmented event, the event as colored by HMM-board, and the emission probabilities 
         for the fork and label region
     
-Special thanks to Jacob Schreiber for PyPore and his contributions to YAHMM
+    For Substep Model:
+        Context = States 10-17 [ C*GGT - ATCC ]
+        Label = States 24-32  [ LTCA - CATL ]
+
 '''
 
 from yahmm import *
 import pandas as pd
 from PyPore.DataTypes import *
-import sys
 
-def Hel308_simple_model( distributions, name, fourmers, low=0, high=90 ):
+def Hel308_model( distributions, name, fourmers, low=0, high=90 ):      ## Substepped -- FIX REREAD STATES
     '''
     'Simple' Hel308 Model
     '''
@@ -39,12 +41,20 @@ def Hel308_simple_model( distributions, name, fourmers, low=0, high=90 ):
         delete = State( None, name="D-{}".format( idx ) )
         
         ## Transitions
-        # S1
-        board.add_transition( board.s1, delete,     0.01 )
-        board.add_transition( board.s1, match,      0.99 )
-        # S2
-        board.add_transition( board.s2, delete,     0.01 )
-        board.add_transition( board.s2, match,      0.99 )
+        if step_count in [3,6,8,13,15,20,24,26,28,30,32]:       # Altered Pr(Delete) for substeps
+            # S1
+            board.add_transition( board.s1, delete,     0.50 )
+            board.add_transition( board.s1, match,      0.50 )
+            # S2
+            board.add_transition( board.s2, delete,     0.50 )
+            board.add_transition( board.s2, match,      0.50 )
+        else:
+            # S1
+            board.add_transition( board.s1, delete,     0.01 )
+            board.add_transition( board.s1, match,      0.99 )
+            # S2
+            board.add_transition( board.s2, delete,     0.01 )
+            board.add_transition( board.s2, match,      0.99 )
         ## Backslip / Dissocation
         # E3
         board.add_transition( board.e3, board.s4,   0.746 )
@@ -216,13 +226,13 @@ def Hel308_simple_model( distributions, name, fourmers, low=0, high=90 ):
     model.bake()
     return model
 
-def build_profile( ):
+def build_profile( ):                                                   ## Fixed for substeps
     '''
     Reads in an excel to obtain profile for the HMM.  
     Profile is stored as a list of distributions with forks represented by dictionaries.
     '''
     profile, dists = [], {}
-    data = pd.read_excel( '../Profile/CCGG.xlsx', 'Sheet3' )
+    data = pd.read_excel( '../Profile/CCGG.xlsx', 'SSp' )
 
     total_means, total_stds = data.mean(axis=0), data.std(axis=0) # Total Profile Man
     total = [ NormalDistribution( m, 1.5 ) for m, s in zip( total_means, total_stds) ]
@@ -232,32 +242,32 @@ def build_profile( ):
         dists[name] = [ NormalDistribution( m, s ) for m, s in zip( means[:11], stds[:11] )]
         dists[name].extend([ NormalDistribution( m, 1.5 ) for m, s in zip( means[11:], stds[11:] )])
 
-    # Piecing the profile together (0-3) = states 1-4
-    for i in xrange(6):
+    # Piecing the profile together 
+    for i in xrange(9):
         profile.append(total[i])
 
-    # Cytosine fork (6-10) = states 7-11
-    for i in xrange(6, 11):
+    # Cytosine fork 9-16 : States 10-17
+    for i in xrange(9, 17):
         profile.append( {'C': dists['C'][i], 'mC': dists['mC'][i], 'hmC': dists['hmC'][i]  })
 
-    # Continuation of profile  (11-15) = states 12-16
-    for i in xrange(11, 16):
+    # Continuation of profile  
+    for i in xrange(17, 23):
         profile.append(total[i])
 
-    # Label Fork (16-20) = states 17-21
-    for i in xrange(16,21):
+    # Label Fork (23-31) = states 24-32
+    for i in xrange(23,32):
         profile.append( {'C': dists['C'][i], 'mC': dists['mC'][i], 'hmC': dists['hmC'][i]  })
 
-    # Continuation of profile  (21-27) = states 22-28
-    for i in xrange(21, 32):
+    # Continuation of profile  
+    for i in xrange(32, 45):
         profile.append(total[i])
         
     fourmers = [ col.replace(' ', '_').replace('.1', '').replace('.2', '') for col in data ][1:] 
     fourmers = [a.encode('ascii', 'ignore') for a in fourmers]
 
     return profile, fourmers
-    
-def parse_abf(abf, start=0, end=750):
+
+def parse_abf(abf, start=0, end=750):                                   # No changes necessary
     '''
     parses an abf file and yields an event
     '''
@@ -276,49 +286,8 @@ def parse_abf(abf, start=0, end=750):
             event.parse( SpeedyStatSplit( prior_segments_per_second = 40, cutoff_freq=2000 ) )
             if len(event.segments) > 15:
                 yield event   
-   
-def viterbi(model, event, fourmers):
-    '''
-    Runs the Viterbi Algorithm -- produces a comprehensive output.
-    '''
 
-    ## Convert the Event into a list of segment means
-    means = [seg.mean for seg in event.segments]
-    ## Run that list through the viterbi algorithm and return emission states
-    vit_path = [ state.name for i, state in model.viterbi(means)[1] if not state.is_silent() ]
-
-    #############
-    #	Output	#
-    #############
-
-    print '# of Observations (Segments): {}'.format( len(means) ) 
-    print 'Start Time of Event: {}'.format( event.start )
-    print '\n', '='*40
-    print '\n{:^}\t\t{:<20} {:^5}'.format('Obs', 'Path', 'Mean'), '\n'
-
-    counter = 0
-    for i, state in enumerate(vit_path):
-        if i < len(vit_path)-2:
-            if state == vit_path[i+1]:
-                counter += 1
-            else:
-                if counter == 0:
-                    print '{:<}\t\t{:<20} {:<}'.format( i, state, round(means[i],1) )
-                else:
-                    mean_list = [ round(x, 1) for x in means[i-counter:i+1] ]
-                    print '{}-{:<}\t\t{:<20} {:<}~'.format( i-counter, i, state, round(np.mean(mean_list),1) )
-                    counter = 0
-        else:
-            if counter == 0:
-                    print '{:<}\t\t{:<20} {:<}'.format( i, state, round(means[i],1) )
-            else:
-                mean_list = [ round(x, 1) for x in means[i-counter:i+1] ]
-                print '{}-{:<}\t\t{:<20} {:<}~'.format( i-counter, i, state, round(np.mean(mean_list),1) )
-                counter = 0
-
-    print '\n', '='*40   
-
-def analyze_event(model, event, trans):
+def analyze_event(model, event, trans, output=True):                    ## Fixed for substeps
     '''
     Uses the Forward-Backward Algorithm to determine expected transitions
     to certain states.
@@ -345,7 +314,7 @@ def analyze_event(model, event, trans):
     hmC_fork = []; hmC_tag = []
 
     ## Parse 'temp' lists fork/tag lists
-    for i in xrange(7,12):  # (6-10) = (7-11).  Changed to 8-10 given heatmap results.
+    for i in xrange(10,18):  # (6-10) = (7-11).  Changed to 8-10 given heatmap results.
         for match in temp_C:
             if ':'+str(i) in match:
                 C_fork.append(match)
@@ -356,7 +325,7 @@ def analyze_event(model, event, trans):
             if ':'+str(i) in match:
                 hmC_fork.append(match)
 
-    for i in xrange(17,22):	# (16-20) = (17-21) because of I0 insert state.
+    for i in xrange(24,33):	# (16-20) = (17-21) because of I0 insert state.
         for match in temp_C:
             if str(i) in match:
                 C_tag.append(match)
@@ -411,33 +380,76 @@ def analyze_event(model, event, trans):
     #############
     #	Output	#
     #############
-
-    print 'Soft Call:\t{}'.format( round( data['Soft Call'], 4 ) ) 
-    print 'Filter Score:\t{}\n'.format( round ( data['Score'], 4 ) )
-    print '-'*40, '\n'
-
-    print 'C:\t\t{}'.format( round( data['C'], 4 ) )
-    print 'mC:\t\t{}'.format( round( data['mC'], 4 ) )
-    print 'hmC:\t\t{}\n'.format( round( data['hmC'], 4 ) )
-    print 'C-tag:\t\t{}'.format( round( data['C-tag'], 4 ) )
-    print 'mC-tag:\t\t{}'.format( round( data['mC-tag'], 4 ) )
-    print 'hmC-tag:\t{}\n'.format( round( data['hmC-tag'], 4 ) )
-    print '-'*40, '\n'
-
-    print 'Estimated Number of Deletes: {}'.format( round( sum( d_trans), 1) ) 
-    print 'Estimated Number of Inserts: {}'.format( round( sum( i_trans), 1) ) 
-    print 'Estimated Number of Single Backslips: {}'.format( round( sum( b1_trans), 1 ) ) 
-    print 'Estimated Number of Backslips (Length=2): {}'.format( round( sum( b2_trans), 1 ) )
-    print 'Estimated Number of Backslips (Length=3): {}'.format( round( sum( b3_trans), 1 ) )
-    print 'Estimated Number of Backslips (Length=4): {}'.format( round( sum( b4_trans), 1 ) )
-    print 'Estimated Number of Backslips (Length=5): {}'.format( round( sum( b5_trans), 1 ) )
-    print 'Estimated Number of Backslips (Min-length:6,+1 per additional): {}'.format( round( sum( dis_trans), 1) )
-    print 'Estimated Number of Rereads: {}'.format ( round (r_trans), 1) 
-
-    return { 'd' : d_trans, 'i' : i_trans, 'b1': b1_trans, 'b2': b2_trans, 'b3' : b3_trans, \
-            'b4' : b4_trans, 'b5' : b5_trans, 'dis' : dis_trans, 'r' : r_trans }
     
-def segment_ems_plot( model, event, ems):
+    if output:
+        print 'Soft Call:\t{}'.format( round( data['Soft Call'], 4 ) ) 
+        print 'Filter Score:\t{}\n'.format( round ( data['Score'], 4 ) )
+        print '-'*40, '\n'
+
+        print 'C:\t\t{}'.format( round( data['C'], 4 ) )
+        print 'mC:\t\t{}'.format( round( data['mC'], 4 ) )
+        print 'hmC:\t\t{}\n'.format( round( data['hmC'], 4 ) )
+        print 'C-tag:\t\t{}'.format( round( data['C-tag'], 4 ) )
+        print 'mC-tag:\t\t{}'.format( round( data['mC-tag'], 4 ) )
+        print 'hmC-tag:\t{}\n'.format( round( data['hmC-tag'], 4 ) )
+        print '-'*40, '\n'
+
+        print 'Estimated Number of Deletes: {}'.format( round( sum( d_trans), 1) ) 
+        print 'Estimated Number of Inserts: {}'.format( round( sum( i_trans), 1) ) 
+        print 'Estimated Number of Single Backslips: {}'.format( round( sum( b1_trans), 1 ) ) 
+        print 'Estimated Number of Backslips (Length=2): {}'.format( round( sum( b2_trans), 1 ) )
+        print 'Estimated Number of Backslips (Length=3): {}'.format( round( sum( b3_trans), 1 ) )
+        print 'Estimated Number of Backslips (Length=4): {}'.format( round( sum( b4_trans), 1 ) )
+        print 'Estimated Number of Backslips (Length=5): {}'.format( round( sum( b5_trans), 1 ) )
+        print 'Estimated Number of Backslips (Min-length:6,+1 per additional): {}'.format( round( sum( dis_trans), 1) )
+        print 'Estimated Number of Rereads: {}'.format ( round (r_trans), 1) 
+
+    return data
+
+
+## Viterbi Output and Plot
+def viterbi(model, event, fourmers):                                    # No changes necessary
+    '''
+    Runs the Viterbi Algorithm -- produces a comprehensive output.
+    '''
+
+    ## Convert the Event into a list of segment means
+    means = [seg.mean for seg in event.segments]
+    ## Run that list through the viterbi algorithm and return emission states
+    vit_path = [ state.name for i, state in model.viterbi(means)[1] if not state.is_silent() ]
+
+    #############
+    #	Output	#
+    #############
+
+    print '# of Observations (Segments): {}'.format( len(means) ) 
+    print 'Start Time of Event: {}'.format( event.start )
+    print '\n', '='*40
+    print '\n{:^}\t\t{:<20} {:^5}'.format('Obs', 'Path', 'Mean'), '\n'
+
+    counter = 0
+    for i, state in enumerate(vit_path):
+        if i < len(vit_path)-2:
+            if state == vit_path[i+1]:
+                counter += 1
+            else:
+                if counter == 0:
+                    print '{:<}\t\t{:<20} {:<}'.format( i, state, round(means[i],1) )
+                else:
+                    mean_list = [ round(x, 1) for x in means[i-counter:i+1] ]
+                    print '{}-{:<}\t\t{:<20} {:<}~'.format( i-counter, i, state, round(np.mean(mean_list),1) )
+                    counter = 0
+        else:
+            if counter == 0:
+                    print '{:<}\t\t{:<20} {:<}'.format( i, state, round(means[i],1) )
+            else:
+                mean_list = [ round(x, 1) for x in means[i-counter:i+1] ]
+                print '{}-{:<}\t\t{:<20} {:<}~'.format( i-counter, i, state, round(np.mean(mean_list),1) )
+                counter = 0
+
+    print '\n', '='*40   
+
+def segment_ems_plot( model, event, ems):                               ## Fixed for substeps
     '''
     Plots 3 items:  Segmented event, Event colored by HMM-state, and an emissions plot
     '''
@@ -468,7 +480,7 @@ def segment_ems_plot( model, event, ems):
     hmC_fork = []; hmC_tag = []
 
     ## Parse 'temp' lists fork/tag lists
-    for i in xrange(7,12):
+    for i in xrange(10,18):
         for match in C_temp:
             if ':'+str(i) in match:
                 C_fork.append(match)
@@ -479,7 +491,7 @@ def segment_ems_plot( model, event, ems):
             if ':'+str(i) in match:
                 hmC_fork.append(match)
                         
-    for i in xrange(17,22):
+    for i in xrange(24,33):
         for match in C_temp:
             if str(i) in match:
                 C_tag.append(match)
@@ -522,7 +534,166 @@ def segment_ems_plot( model, event, ems):
     plt.tight_layout()
     plt.show()	
  
-def trans_plot( trans_dict ): ## Not working 
+ 
+## Partitioning and Chunkie Functions
+def partition_event( indices, event, ems, means ):                      ## Fixed for substeps        
+    '''
+    Partitions event based on the emission matrix from the Forward-Backward Algorithm
+    '''
+    
+    ## Find fork regions
+    forks = [x for x in indices.keys() if '(C)' in x or '(mC)' in x or '(hmC)' in x ]
+    forks = [x for x in forks if 'b' not in x and 'D' not in x and 'I' not in x ]
+    
+    ## Split into context and label fork
+    C_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(10, 18) ]
+    L_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(24, 33) ]
+    
+     ## Get the index values for each name in the fork / label
+    C_all = np.array( map( indices.__getitem__, C_fork ) )
+    L_all = np.array( map( indices.__getitem__, L_fork ) )
+    
+    ## Use those index values to compute probabilities by observation
+    pC_all = np.exp( ems[ :, C_all ] ).sum( axis=1 )
+    pL_all = np.exp( ems[:, L_all ] ).sum( axis=1 )
+    
+    ## Partition Events given emission matrix
+    contexts, labels = [], []
+    temp_c, temp_l = [], []
+    
+    for i in xrange(len(pC_all)): 
+        ## Contexts
+        if pC_all[i] > 0.5:         
+            temp_c.append( i )
+        if pC_all[i] <= 0.5:
+            if temp_c:
+                contexts.append( temp_c )
+                temp_c = []
+        ## Labels
+        if pL_all[i] > 0.5:
+            temp_l.append( i )
+        if pL_all[i] <= 0.5:
+            if temp_l:
+                labels.append( temp_l )
+                temp_l = []
+    
+    return contexts, labels
+    
+def chunk_score( indices, contexts, labels, ems ):                      ## Will need to change for just steps
+    ''' This function will score each context / label chunk '''
+    
+    indices = { state.name: i for i, state in enumerate( model.states ) }
+
+    ## Find fork regions
+    forks = [x for x in indices.keys() if '(C)' in x or '(mC)' in x or '(hmC)' in x ]
+    forks = [x for x in forks if 'b' not in x and 'D' not in x and 'I' not in x ]
+    
+    ## Split into context and label fork
+    C_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(7, 12) ]
+    L_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(17, 22) ]
+    
+    ## Create dictionary for each state N in the fork
+    c_dict, l_dict = OrderedDict(), OrderedDict()
+    for i in xrange(10,18):
+        c_dict[i] = np.array( map( indices.__getitem__, [x for x in C_fork if ':'+str(i) in x] ) )
+    for i in xrange(24, 33):
+        l_dict[i] = np.array( map ( indices.__getitem__, [x for x in L_fork if ':'+str(i) in x] ) )
+    
+    ## Obtain Prior for each Context ##
+    p_dict = OrderedDict()
+    pscore = []
+    context_final = []
+    weights = [ 1.0/9, 2.0/9, 1.0/3, 2.0/9, 1.0/9 ]
+    for c in contexts:
+        temp_ems = ems[ c, : ]                   # Slice matrix based on observations
+        for i in xrange(7,12):
+            p_dict[i] = np.max( np.exp( temp_ems[:, c_dict[i] ]).sum( axis=1 ) )
+        
+        ## Combine P_scores into a single score
+        pscore = [ p_dict[x] for x in p_dict ] 
+        pscore = [ a*b for a,b in izip(pscore, weights) ]
+        pscore = sum(pscore)
+        
+        #if pscore > 0.9:
+        context_final.append( (round(pscore,4), c) )
+    
+    ## Obtain Prior for each Label ##
+    p_dict = OrderedDict()
+    pscore = []
+    label_final = []
+    weights = [1.0/11, 2.0/11, 3.0/11, 3.0/11, 2.0/11]
+    for l in labels:
+        temp_ems = ems[ l, : ]
+        for i in xrange( 17, 22):
+            p_dict[i] = np.max( np.exp( temp_ems[:, l_dict[i] ]).sum( axis=1 ) )
+        
+        ## Combine P_scores into a single score
+        pscore = [p_dict[x] for x in p_dict]
+        pscore = [a*b for a,b in izip(pscore, weights) ]
+        pscore = sum(pscore)
+        
+        #if pscore > 0.9:
+        label_final.append( (round(pscore,4), l) )
+    
+    return context_final, label_final
+    
+def chunk_vector( indices, contexts, labels, ems ):                     ## Check to make sure same method works
+    
+    ## Find indices for each context
+    C = [ x for x in indices.keys() if '(C)' in x and 'b' not in x and 'I' not in x and 'D' not in x]
+    mC = [ x for x in indices.keys() if '(mC)' in x and 'b' not in x and 'I' not in x and 'D' not in x]
+    hmC = [ x for x in indices.keys() if '(hmC)' in x and 'b' not in x and 'I' not in x and 'D' not in x]
+    
+    ## Separate into tags and forks for each context
+    C_fork = [ x for x in C if int(x.split(':')[1]) in xrange(7,12) ]
+    C_tag = [ x for x in C if int(x.split(':')[1]) in xrange(17, 22) ]
+    
+    mC_fork = [ x for x in mC if int(x.split(':')[1]) in xrange(7,12) ]
+    mC_tag = [ x for x in mC if int(x.split(':')[1]) in xrange(17, 22) ]
+
+    hmC_fork = [ x for x in hmC if int(x.split(':')[1]) in xrange(7,12) ]
+    hmC_tag = [ x for x in hmC if int(x.split(':')[1]) in xrange(17, 22) ]
+    
+    ## Get indices for each context / label fork
+    C_fork = np.array( map( indices.__getitem__, C_fork ) )
+    mC_fork = np.array( map( indices.__getitem__, mC_fork ) )
+    hmC_fork = np.array( map( indices.__getitem__, hmC_fork ) )
+    
+    C_tag = np.array( map( indices.__getitem__, C_tag ) )
+    mC_tag = np.array( map( indices.__getitem__, mC_tag ) )
+    hmC_tag = np.array( map( indices.__getitem__, hmC_tag ) )
+    
+    ## Get a vector for each chunk
+    context_final, label_final = [], []
+    vector = []
+    for c in contexts:
+        temp_ems = ems[ c[1], : ]                       # Slice matrix based on observations
+                                                        # Slice matrix by fork & sum
+        vector.append( np.mean( np.exp( temp_ems[:, C_fork ]).sum( axis=1 ) ) ) 
+        vector.append( np.mean( np.exp( temp_ems[:, mC_fork ]).sum( axis=1 ) ) )
+        vector.append( np.mean( np.exp( temp_ems[:, hmC_fork ]).sum( axis=1 ) ) )
+        
+        vector = [ x*1.0/sum(vector) for x in vector ]    # Normalize list to sum to 1
+        
+        context_final.append( ( c[0], vector, c[1] ) )  
+        vector = []
+    
+    for l in labels:
+        temp_ems = ems[ l[1], : ]
+        vector.append( np.mean( np.exp( temp_ems[:, C_tag ]).sum( axis=1 ) ) )
+        vector.append( np.mean( np.exp( temp_ems[:, mC_tag ]).sum( axis=1 ) ) )
+        vector.append( np.mean( np.exp( temp_ems[:, hmC_tag ]).sum( axis=1 ) ) )
+        
+        vector = [ x*1.0/sum(vector) for x in vector ]    # Normalize list to sum to 1
+        
+        label_final.append( ( l[0], vector, l[1] ) )
+        vector = []
+    
+    return context_final, label_final
+
+
+## Not working / Unneeded ?
+def trans_plot( trans_dict ): 
     '''
     Creates a plot showing where certain events occur in relation to the states in the model
     
@@ -558,38 +729,3 @@ def trans_plot( trans_dict ): ## Not working
     plt.tight_layout()
     plt.show()
  
-print '\n-=Building Profile=-'
-distributions, fourmers = build_profile()
-
-print '-=Building HMM=-'
-model = Hel308_simple_model( distributions, 'Test-31', fourmers )
-
-print '-=Parsing ABF=-'
-for event in parse_abf('../Data/Mixed/14710002-s01.abf', 123, 124):
-    
-    print '-=Determining Viterbi Path=-'
-    viterbi(model, event, fourmers)
-    
-    ## Perform the forward_backward algorithm to return transmission and emission matrices
-    means = [seg.mean for seg in event.segments]
-    trans, ems = model.forward_backward( means )
-    
-    ## Summary Information 
-    trans_dict = analyze_event( model, event, trans )
-
-    ## Plots
-    segment_ems_plot( model, event, ems)   
-    '''
-    This is how to SAVE the HMM after you've created/trained it
-    with open( 'test.txt', 'w' ) as file:
-        model.write( file )
-    '''
-
-'''
-Change-Log (Semantic Versioning:  Major-Minor-Patch)
-
-
-Version 0.1.2       -       9-19-14
-Version 0.1.0       -       9-18-14
-    1. Initial Commit
-'''
