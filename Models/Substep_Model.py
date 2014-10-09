@@ -14,7 +14,7 @@ Substep_Model.py is a collection of functions that perform the following operati
     
     For Substep Model:
         Context = States 10-17 [ C*GGT - ATCC ]
-        Label = States 24-32  [ LTCA - CATL ]
+        Label = States 24-33  [ LTCA - CATL ]
 
 '''
 
@@ -43,11 +43,11 @@ def Hel308_model( distributions, name, fourmers, low=0, high=90 ):      ## Subst
         ## Transitions
         if step_count in [3,6,8,13,15,20,24,26,28,30,32]:       # Altered Pr(Delete) for substeps
             # S1
-            board.add_transition( board.s1, delete,     0.50 )
-            board.add_transition( board.s1, match,      0.50 )
+            board.add_transition( board.s1, delete,     0.75 )
+            board.add_transition( board.s1, match,      0.25 )
             # S2
-            board.add_transition( board.s2, delete,     0.50 )
-            board.add_transition( board.s2, match,      0.50 )
+            board.add_transition( board.s2, delete,     0.75 )
+            board.add_transition( board.s2, match,      0.25 )
         else:
             # S1
             board.add_transition( board.s1, delete,     0.01 )
@@ -83,7 +83,7 @@ def Hel308_model( distributions, name, fourmers, low=0, high=90 ):      ## Subst
         board.add_transition( insert, insert,       0.50 )
         board.add_transition( insert, board.e2,     0.40 )
         ## Match
-        if step_count in xrange( 21, 31 ):
+        if step_count in xrange( 31, 43 ):
             board.add_transition( match, match,         0.24 )
             board.add_transition( match, board.e2,      0.70 )
             board.add_transition( match, insert,        0.02 )
@@ -117,11 +117,9 @@ def Hel308_model( distributions, name, fourmers, low=0, high=90 ):      ## Subst
             ## Reread Contigency ################################
             if step_count in [0,5]:                             #
                 model.add_transition (reread, match, 0.4)       #
-            if step_count in [2,3]:                             #
-                model.add_transition (reread, match, 0.07)      #
-            if step_count in [4]:                               #
-                model.add_transition (reread, match, 0.06)      #
-            if step_count in xrange(21,31):                     #
+            if step_count in [1,2,3,4,6]:                       #
+                model.add_transition (reread, match, 0.04)      #    
+            if step_count in xrange(31,43):                     #
                 model.add_transition (match, reread, 0.02 )     #
             ## Reread Contigency ################################
             
@@ -169,11 +167,9 @@ def Hel308_model( distributions, name, fourmers, low=0, high=90 ):      ## Subst
                 ## Reread Contigency ################################
                 if step_count in [0,5]:                             #
                     model.add_transition (reread, match, 0.4)       #
-                if step_count in [2,3]:                             #
-                    model.add_transition (reread, match, 0.07)      #
-                if step_count in [4]:                               #
-                    model.add_transition (reread, match, 0.06)      #
-                if step_count in xrange(21,31):                     #
+                if step_count in [1,2,3,4,6]:                       #
+                    model.add_transition (reread, match, 0.04)      #    
+                if step_count in xrange(31,43):                     #
                     model.add_transition (match, reread, 0.02 )     #
                 ## Reread Contigency ################################
             
@@ -255,11 +251,11 @@ def build_profile( ):                                                   ## Fixed
         profile.append(total[i])
 
     # Label Fork (23-31) = states 24-32
-    for i in xrange(23,32):
+    for i in xrange(23,33):
         profile.append( {'C': dists['C'][i], 'mC': dists['mC'][i], 'hmC': dists['hmC'][i]  })
 
     # Continuation of profile  
-    for i in xrange(32, 45):
+    for i in xrange(33, 44):
         profile.append(total[i])
         
     fourmers = [ col.replace(' ', '_').replace('.1', '').replace('.2', '') for col in data ][1:] 
@@ -325,7 +321,7 @@ def analyze_event(model, event, trans, output=True):                    ## Fixed
             if ':'+str(i) in match:
                 hmC_fork.append(match)
 
-    for i in xrange(24,33):	# (16-20) = (17-21) because of I0 insert state.
+    for i in xrange(24,34):	# (16-20) = (17-21) because of I0 insert state.
         for match in temp_C:
             if str(i) in match:
                 C_tag.append(match)
@@ -491,7 +487,7 @@ def segment_ems_plot( model, event, ems):                               ## Fixed
             if ':'+str(i) in match:
                 hmC_fork.append(match)
                         
-    for i in xrange(24,33):
+    for i in xrange(24,34):
         for match in C_temp:
             if str(i) in match:
                 C_tag.append(match)
@@ -547,7 +543,7 @@ def partition_event( indices, event, ems, means ):                      ## Fixed
     
     ## Split into context and label fork
     C_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(10, 18) ]
-    L_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(24, 33) ]
+    L_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(24, 34) ]
     
      ## Get the index values for each name in the fork / label
     C_all = np.array( map( indices.__getitem__, C_fork ) )
@@ -579,8 +575,11 @@ def partition_event( indices, event, ems, means ):                      ## Fixed
     
     return contexts, labels
     
-def chunk_score( indices, contexts, labels, ems ):                      ## Will need to change for just steps
-    ''' This function will score each context / label chunk '''
+def chunk_score( indices, contexts, labels, ems ):                      ## Fixed for substeps
+    ''' This function will score each context / label chunk 
+        Context steps = [ 10, 12, 13, 15, 17 ]
+        Label steps = [ 24, 26, 28, 30, 32 ]
+    '''
     
     indices = { state.name: i for i, state in enumerate( model.states ) }
 
@@ -589,14 +588,14 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Will 
     forks = [x for x in forks if 'b' not in x and 'D' not in x and 'I' not in x ]
     
     ## Split into context and label fork
-    C_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(7, 12) ]
-    L_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(17, 22) ]
+    C_fork = [ x for x in forks if int(x.split(':')[1]) in [ 10, 12, 13, 15, 17 ] ]
+    L_fork = [ x for x in forks if int(x.split(':')[1]) in [ 24, 26, 28, 30, 32 ] ]
     
     ## Create dictionary for each state N in the fork
     c_dict, l_dict = OrderedDict(), OrderedDict()
-    for i in xrange(10,18):
+    for i in [ 10, 12, 13, 15, 17 ]:
         c_dict[i] = np.array( map( indices.__getitem__, [x for x in C_fork if ':'+str(i) in x] ) )
-    for i in xrange(24, 33):
+    for i in [ 24, 26, 28, 30, 32 ]:
         l_dict[i] = np.array( map ( indices.__getitem__, [x for x in L_fork if ':'+str(i) in x] ) )
     
     ## Obtain Prior for each Context ##
@@ -606,7 +605,7 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Will 
     weights = [ 1.0/9, 2.0/9, 1.0/3, 2.0/9, 1.0/9 ]
     for c in contexts:
         temp_ems = ems[ c, : ]                   # Slice matrix based on observations
-        for i in xrange(7,12):
+        for i in [ 10, 12, 13, 15, 17 ]:
             p_dict[i] = np.max( np.exp( temp_ems[:, c_dict[i] ]).sum( axis=1 ) )
         
         ## Combine P_scores into a single score
@@ -624,7 +623,7 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Will 
     weights = [1.0/11, 2.0/11, 3.0/11, 3.0/11, 2.0/11]
     for l in labels:
         temp_ems = ems[ l, : ]
-        for i in xrange( 17, 22):
+        for i in [ 24, 26, 28, 30, 32 ]:
             p_dict[i] = np.max( np.exp( temp_ems[:, l_dict[i] ]).sum( axis=1 ) )
         
         ## Combine P_scores into a single score
@@ -645,14 +644,14 @@ def chunk_vector( indices, contexts, labels, ems ):                     ## Check
     hmC = [ x for x in indices.keys() if '(hmC)' in x and 'b' not in x and 'I' not in x and 'D' not in x]
     
     ## Separate into tags and forks for each context
-    C_fork = [ x for x in C if int(x.split(':')[1]) in xrange(7,12) ]
-    C_tag = [ x for x in C if int(x.split(':')[1]) in xrange(17, 22) ]
+    C_fork = [ x for x in C if int(x.split(':')[1]) in xrange(10,18) ]
+    C_tag = [ x for x in C if int(x.split(':')[1]) in xrange(24, 34) ]
     
-    mC_fork = [ x for x in mC if int(x.split(':')[1]) in xrange(7,12) ]
-    mC_tag = [ x for x in mC if int(x.split(':')[1]) in xrange(17, 22) ]
+    mC_fork = [ x for x in mC if int(x.split(':')[1]) in xrange(10,18) ]
+    mC_tag = [ x for x in mC if int(x.split(':')[1]) in xrange(24, 34) ]
 
-    hmC_fork = [ x for x in hmC if int(x.split(':')[1]) in xrange(7,12) ]
-    hmC_tag = [ x for x in hmC if int(x.split(':')[1]) in xrange(17, 22) ]
+    hmC_fork = [ x for x in hmC if int(x.split(':')[1]) in xrange(10,18) ]
+    hmC_tag = [ x for x in hmC if int(x.split(':')[1]) in xrange(24, 34) ]
     
     ## Get indices for each context / label fork
     C_fork = np.array( map( indices.__getitem__, C_fork ) )
