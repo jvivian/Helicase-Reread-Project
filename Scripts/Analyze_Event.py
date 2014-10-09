@@ -3,9 +3,21 @@
 # 10-8-14
 
 ## Import of Model, build_profile, parse_abf, and analyze_event, and segment_ems_plot
-import sys
+import sys, argparse
+
+parser = argparse.ArgumentParser(description='Can run either simple or substep model')
+parser.add_argument('-s','--substep', action='store_true', help='Imports substep model instead of simple')
+args = vars(parser.parse_args())
+
 sys.path.append( '../Models' )
-from Simple_Model import *
+if args['substep']:
+    print '\n-=SUBSTEP MODEL=-'
+    from Substep_Model import *
+else:
+    print '\n-=SIMPLE Model=-'
+    from Simple_Model import *
+
+
 
 ################################
 
@@ -13,7 +25,10 @@ print '\n-=Building Profile=-'
 distributions, fourmers = build_profile()
 
 print '-=Building HMM=-'
-model = Hel308_model( distributions, 'Test-31', fourmers )
+if args['substep']:
+    model = Hel308_model( distributions, 'Test-43', fourmers )
+else:
+    model = Hel308_model( distributions, 'Test-31', fourmers )
 
 print '-=Parsing ABF=-'
 for event in parse_abf('../Data/Mixed/14710002-s01.abf', 259, 260):
