@@ -6,7 +6,7 @@
 import sys, argparse
 
 parser = argparse.ArgumentParser(description='Can run either simple or substep model')
-parser.add_argument('-s','--substep', action='store_true', help='Imports substep model instead of simple')
+parser.add_argument('-s','--substep', action='store_true', help='Imports substep model')
 args = vars(parser.parse_args())
 
 sys.path.append( '../Models' )
