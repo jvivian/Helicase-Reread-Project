@@ -8,12 +8,21 @@ single molecules.
 '''
 
 import numpy as np
-from collections import OrderedDict
 
 ## Import of Model, build_profile, parse_abf, and analyze_event
-import sys
+import sys, argparse
+
+parser = argparse.ArgumentParser(description='Can run either simple or substep model')
+parser.add_argument('-s','--substep', help='Imports substep model instead of simple')
+args = vars(parser.parse_args())
+
 sys.path.append( '../Models' )
-from Simple_Model import *
+if args['substep']:
+    print '\n-=SUBSTEP=-'
+    from Substep_Model import *
+else:
+    print '\n-=SIMPLE=-'
+    from Simple_Model import *
 
 
 ## Methods
