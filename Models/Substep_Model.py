@@ -21,6 +21,7 @@ Substep_Model.py is a collection of functions that perform the following operati
 from yahmm import *
 import pandas as pd
 from PyPore.DataTypes import *
+from collections import OrderedDict
 
 def Hel308_model( distributions, name, fourmers, low=0, high=90 ):      ## Fixed for substeps
     '''
@@ -235,8 +236,8 @@ def build_profile( ):                                                   ## Fixed
 
     for name, frame in data.groupby('label'):
         means, stds = frame.mean(axis=0), frame.std(axis=0)
-        dists[name] = [ NormalDistribution( m, s ) for m, s in zip( means[:11], stds[:11] )]
-        dists[name].extend([ NormalDistribution( m, 1.5 ) for m, s in zip( means[11:], stds[11:] )])
+        dists[name] = [ NormalDistribution( m, s ) for m, s in zip( means[:17], stds[:17] )]
+        dists[name].extend([ NormalDistribution( m, 1.5 ) for m, s in zip( means[17:], stds[17:] )])
 
     # Piecing the profile together 
     for i in xrange(9):
@@ -580,8 +581,6 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Fixed
         Context steps = [ 10, 12, 13, 15, 17 ]
         Label steps = [ 24, 26, 28, 30, 32 ]
     '''
-    
-    indices = { state.name: i for i, state in enumerate( model.states ) }
 
     ## Find fork regions
     forks = [x for x in indices.keys() if '(C)' in x or '(mC)' in x or '(hmC)' in x ]
@@ -615,7 +614,7 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Fixed
         
         #if pscore > 0.9:
         context_final.append( (round(pscore,4), c) )
-    
+
     ## Obtain Prior for each Label ##
     p_dict = OrderedDict()
     pscore = []
@@ -633,7 +632,7 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Fixed
         
         #if pscore > 0.9:
         label_final.append( (round(pscore,4), l) )
-    
+        
     return context_final, label_final
     
 def chunk_vector( indices, contexts, labels, ems ):                     ## Check to make sure same method works
