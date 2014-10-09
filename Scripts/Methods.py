@@ -13,7 +13,7 @@ import numpy as np
 import sys, argparse
 
 parser = argparse.ArgumentParser(description='Can run either simple or substep model')
-parser.add_argument('-s','--substep', help='Imports substep model instead of simple')
+parser.add_argument('-s','--substep', action='store_true', help='Imports substep model instead of simple')
 args = vars(parser.parse_args())
 
 sys.path.append( '../Models' )
@@ -31,8 +31,8 @@ def first_chunk( contexts, labels ):
     ''' use the first chunk of each group'''
     
     ## Pull out high quality events
-    C = [ x for x in contexts if x[0] >= 0.9 ]     
-    L = [x for x in labels if x[0] >= 0.9 ]
+    C = [ x for x in contexts if x[0] >= 0.5 ]     
+    L = [x for x in labels if x[0] >= 0.5 ]
     
     ## Select first event
     C = C[0]
@@ -131,7 +131,7 @@ for event in parse_abf('../Data/Mixed/'+file):
         ## Get chunk vector
         contexts, labels = chunk_vector( indices, contexts, labels, ems )
         
-        if max( [ x[0] for x in contexts ] ) >= 0.9 and max( [ x[0] for x in labels ] ) >= 0.9:
+        if max( [ x[0] for x in contexts ] ) >= 0.5 and max( [ x[0] for x in labels ] ) >= 0.5:
             
             ## First Chunk
             sc_fchunk, fcall = first_chunk( contexts, labels )
@@ -141,3 +141,5 @@ for event in parse_abf('../Data/Mixed/'+file):
             
             print 'First Chunk: {}, Call: {}, Label: {}'.format( round(sc_fchunk,2), fcall[0], fcall[1] )
             print 'Best Chunk: {}, Call: {}, Label: {}'.format( round(sc_bchunk,2), bcall[0], bcall[1] )
+            
+            
