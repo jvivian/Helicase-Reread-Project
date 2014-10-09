@@ -524,7 +524,6 @@ def segment_ems_plot( model, event, ems):
     plt.xlabel( 'Sequence Position' )
     plt.legend()
 
-
     plt.tight_layout()
     plt.show()	
  
