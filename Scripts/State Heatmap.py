@@ -16,7 +16,7 @@ total_diff = []
 dist = {}
 
 ## Read in data to a DataFrame
-data = pd.read_excel( '../Profile/CCGG.xlsx', 'Sheet3')
+data = pd.read_excel( '../Profile/CCGG.xlsx', 'SSp')
 
 ## Split DataFrames by label and store the means of each as a Series
 for name, frame in data.groupby( 'label' ):
@@ -31,9 +31,9 @@ C_hmC = np.abs( dist['C'] - dist['hmC'] ).tolist()
 total = zip( dist['C'], dist['mC'], dist['hmC'] )
 for item in total:
     total_diff.append( abs( np.max(item) - np.min(item) ) )
-
+    
 ## Assemble Final DataFrame
-df = pd.DataFrame( [ C_mC[:16], mC_hmC[:16], C_hmC[:16], total_diff[:16] ] )   # Context
+df = pd.DataFrame( [ C_mC[:18], mC_hmC[:18], C_hmC[:18], total_diff[:18] ] )   # Context
 #df = pd.DataFrame( [ C_mC[10:], mC_hmC[10:], C_hmC[10:], total_diff[10:] ] )    # Label
 
 ## Plotting
@@ -49,12 +49,12 @@ plt.xticks(rotation=50)
 
 # Labels
 row_labels = ['C_mC', 'mC_hmC', 'C_hmC', 'Max $\Delta$ ']
-column_labels = data.columns[1:17]     # Context
+column_labels = data.columns[1:19]     # Context
 #column_labels = data.columns[11:]       # Label
 column_labels = [x.replace('.1','').replace('.2','') for x in column_labels]
 ax.set_xticklabels(column_labels, minor=False)
 ax.set_yticklabels(row_labels, minor=False)
-plt.gca().set_xlim(0, 16)      # Context
+plt.gca().set_xlim(0, 18)      # Context
 #plt.gca().set_xlim(0, 22)       # Label
 plt.title( 'State Importance' )
 
