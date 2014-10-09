@@ -22,7 +22,7 @@ from yahmm import *
 import pandas as pd
 from PyPore.DataTypes import *
 
-def Hel308_model( distributions, name, fourmers, low=0, high=90 ):      ## Substepped -- FIX REREAD STATES
+def Hel308_model( distributions, name, fourmers, low=0, high=90 ):      ## Fixed for substeps
     '''
     'Simple' Hel308 Model
     '''
