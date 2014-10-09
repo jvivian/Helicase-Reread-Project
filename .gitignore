@@ -6,3 +6,6 @@
 # Ignoring ABF filess
 *.abf
 *.tmp
+
+# Ignore .pyc files
+*.pyc
