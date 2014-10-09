@@ -22,6 +22,7 @@ Simple_Model.py is a collection of functions that perform the following operatio
 from yahmm import *
 import pandas as pd
 from PyPore.DataTypes import *
+from collections import OrderedDict
 
 ## Model, profile, abf parsing, and event analysis
 def Hel308_model( distributions, name, fourmers, low=0, high=90 ):
@@ -574,8 +575,6 @@ def partition_event( indices, event, ems, means ):
     
 def chunk_score( indices, contexts, labels, ems ):
     ''' This function will score each context / label chunk '''
-    
-    indices = { state.name: i for i, state in enumerate( model.states ) }
 
     ## Find fork regions
     forks = [x for x in indices.keys() if '(C)' in x or '(mC)' in x or '(hmC)' in x ]
