@@ -31,7 +31,7 @@ else:
     model = Hel308_model( distributions, 'Test-31', fourmers )
 
 print '-=Parsing ABF=-'
-for event in parse_abf('../Data/Mixed/14710002-s01.abf', 259, 260):
+for event in parse_abf('../Data/Mixed/14716003-s01.abf', 102, 103 ):
     
     print '-=Determining Viterbi Path=-'
     viterbi(model, event, fourmers)
