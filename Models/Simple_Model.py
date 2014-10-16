@@ -272,7 +272,7 @@ def parse_abf(abf, start=0, end=750):
     file = File(abf)
     file.parse(parser=lambda_event_parser(threshold=108, rules = [ lambda event: event.duration > 1, 
             lambda event: event.min > -500, lambda event: event.max < 110 ]) )	
-    print '-=File Parsed=-'
+    print '\tFile: Parsed'
 
     ## Crude Event Filter
     for event in file.events:
@@ -281,7 +281,9 @@ def parse_abf(abf, start=0, end=750):
             event.parse( SpeedyStatSplit( prior_segments_per_second = 40, cutoff_freq=2000 ) )
             if len(event.segments) > 15:
                 yield event   
-
+    
+    file.delete()
+    
 def analyze_event(model, event, trans, output=True):
     '''
     Uses the Forward-Backward Algorithm to determine expected transitions
