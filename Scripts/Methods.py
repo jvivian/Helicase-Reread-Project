@@ -245,28 +245,28 @@ for file in files:
                 #############
                 
                 print '-=Single Read Methods=-'
-                print 'First Chunk: {:<8} Hard Call: {:<4}, Label: {}'.format( round(fchunk,4), fcall[0], fcall[1] )
+                print 'First Chunk: {:<11} Hard Call: {:<4}, Label: {}'.format( round(fchunk,4), fcall[0], fcall[1] )
                 if fcall[0] == fcall[1]:
                     bins['f'] += 1
         
-                print 'Last Chunk: {:<8} Hard Call: {:<4}, label: {}'.format( round(lchunk,4), lcall[0], lcall[1] )
+                print 'Last Chunk: {:<11} Hard Call: {:<4}, label: {}'.format( round(lchunk,4), lcall[0], lcall[1] )
                 if lcall[0] == lcall[1]:
                     bins['l'] += 1
                     
-                print 'Random Chunk: {:<8} Hard Call: {:<4}, Label: {}'.format( round(rchunk,4), rcall[0], rcall[1] )
+                print 'Random Chunk: {:<11} Hard Call: {:<4}, Label: {}'.format( round(rchunk,4), rcall[0], rcall[1] )
                 if rcall[0] == rcall[1]:
                     bins['r'] += 1
                 
                 print '-=Multi-Read Methods=-'
-                print 'Best Chunk: {:<8} Hard Call: {:<4}, Label: {}'.format( round(bchunk,4), bcall[0], bcall[1] )
+                print 'Best Chunk: {:<11} Hard Call: {:<4}, Label: {}'.format( round(bchunk,4), bcall[0], bcall[1] )
                 if bcall[0] == bcall[1]:
                     bins['b'] += 1
                     
-                print 'Ind Consensus: {:<8} Hard Call: {:<4}, Label: {}'.format( round(ichunk,4), icall[0], icall[1] ) 
+                print 'Ind Consensus: {:<11} Hard Call: {:<4}, Label: {}'.format( round(ichunk,4), icall[0], icall[1] ) 
                 if icall[0] == icall[1]:
                     bins['i'] += 1
                     
-                print 'HMM Consensus: {:<8} Hard Call: {:<4}, Label: {}'.format( round(hchunk,4), hcall[0], hcall[1] ) 
+                print 'HMM Consensus: {:<11} Hard Call: {:<4}, Label: {}'.format( round(hchunk,4), hcall[0], hcall[1] ) 
                 if hcall[0] == hcall[1]:
                     bins['h'] += 1
                 
