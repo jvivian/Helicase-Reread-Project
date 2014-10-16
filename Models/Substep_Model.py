@@ -274,7 +274,7 @@ def parse_abf(abf, start=0, end=750):                                   # No cha
     file = File(abf)
     file.parse(parser=lambda_event_parser(threshold=108, rules = [ lambda event: event.duration > 1, 
             lambda event: event.min > -500, lambda event: event.max < 110 ]) )	
-    print '-=File Parsed=-'
+    print '\tFile: Parsed'
 
     ## Crude Event Filter
     for event in file.events:
@@ -283,7 +283,9 @@ def parse_abf(abf, start=0, end=750):                                   # No cha
             event.parse( SpeedyStatSplit( prior_segments_per_second = 40, cutoff_freq=2000 ) )
             if len(event.segments) > 15:
                 yield event   
-
+    
+    file.delete()
+    
 def analyze_event(model, event, trans, output=True):                    ## Fixed for substeps
     '''
     Uses the Forward-Backward Algorithm to determine expected transitions
@@ -578,8 +580,8 @@ def partition_event( indices, event, ems, means ):                      ## Fixed
     
 def chunk_score( indices, contexts, labels, ems ):                      ## Fixed for substeps
     ''' This function will score each context / label chunk 
-        Context steps = [ 10, 12, 13, 15, 17 ]
-        Label steps = [ 24, 26, 28, 30, 32 ]
+        Context steps = [ 10, 12, 13, 15, 17 ] (10, 17)
+        Label steps = [ 24, 26, 28, 30, 32 ] (24, 33)
     '''
 
     ## Find fork regions
@@ -587,15 +589,32 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Fixed
     forks = [x for x in forks if 'b' not in x and 'D' not in x and 'I' not in x ]
     
     ## Split into context and label fork
-    C_fork = [ x for x in forks if int(x.split(':')[1]) in [ 10, 12, 13, 15, 17 ] ]
-    L_fork = [ x for x in forks if int(x.split(':')[1]) in [ 24, 26, 28, 30, 32 ] ]
+    C_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(10, 18) ]
+    L_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(24, 34) ]
     
     ## Create dictionary for each state N in the fork
+    '''
     c_dict, l_dict = OrderedDict(), OrderedDict()
     for i in [ 10, 12, 13, 15, 17 ]:
         c_dict[i] = np.array( map( indices.__getitem__, [x for x in C_fork if ':'+str(i) in x] ) )
     for i in [ 24, 26, 28, 30, 32 ]:
         l_dict[i] = np.array( map ( indices.__getitem__, [x for x in L_fork if ':'+str(i) in x] ) )
+    '''
+    
+    ## Test Method 
+    c_dict, l_dict = OrderedDict(), OrderedDict()
+    
+    c_dict[1] = np.array( map( indices.__getitem__, [x for x in C_fork if ':'+str(10) in x or ':'+str(11) in x] ) )
+    c_dict[2] = np.array( map( indices.__getitem__, [x for x in C_fork if ':'+str(12) in x ] ) ) 
+    c_dict[3] = np.array( map( indices.__getitem__, [x for x in C_fork if ':'+str(13) in x or ':'+str(14) in x] ) )
+    c_dict[4] = np.array( map( indices.__getitem__, [x for x in C_fork if ':'+str(15) in x or ':'+str(16) in x] ) )
+    c_dict[5] = np.array( map( indices.__getitem__, [x for x in C_fork if ':'+str(17) in x ] ) ) 
+    
+    l_dict[1] = np.array( map( indices.__getitem__, [x for x in L_fork if ':'+str(24) in x or ':'+str(25) in x] ) )
+    l_dict[2] = np.array( map( indices.__getitem__, [x for x in L_fork if ':'+str(26) in x or ':'+str(27) in x] ) )
+    l_dict[3] = np.array( map( indices.__getitem__, [x for x in L_fork if ':'+str(28) in x or ':'+str(29) in x] ) )
+    l_dict[4] = np.array( map( indices.__getitem__, [x for x in L_fork if ':'+str(30) in x or ':'+str(31) in x] ) )
+    l_dict[5] = np.array( map( indices.__getitem__, [x for x in L_fork if ':'+str(32) in x or ':'+str(33) in x] ) )
     
     ## Obtain Prior for each Context ##
     p_dict = OrderedDict()
@@ -604,7 +623,7 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Fixed
     weights = [ 1.0/9, 2.0/9, 1.0/3, 2.0/9, 1.0/9 ]
     for c in contexts:
         temp_ems = ems[ c, : ]                   # Slice matrix based on observations
-        for i in [ 10, 12, 13, 15, 17 ]:
+        for i in xrange(1, 6):
             p_dict[i] = np.max( np.exp( temp_ems[:, c_dict[i] ]).sum( axis=1 ) )
         
         ## Combine P_scores into a single score
@@ -622,7 +641,7 @@ def chunk_score( indices, contexts, labels, ems ):                      ## Fixed
     weights = [1.0/11, 2.0/11, 3.0/11, 3.0/11, 2.0/11]
     for l in labels:
         temp_ems = ems[ l, : ]
-        for i in [ 24, 26, 28, 30, 32 ]:
+        for i in xrange(1, 6):
             p_dict[i] = np.max( np.exp( temp_ems[:, l_dict[i] ]).sum( axis=1 ) )
         
         ## Combine P_scores into a single score
