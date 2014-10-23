@@ -30,7 +30,7 @@ model = Hel308_model( profile[0], 'PW-31', profile[1] )
 
 print 'HMM before training'
 print model
-with open ( '../Data/Trained_HMM/untrained.txt', 'w' ) as file:
+with open ( '../Data/HMMs/untrained.txt', 'w' ) as file:
     model.write( file )
 
 print 'Training HMM'
@@ -39,7 +39,7 @@ model.train( sequences )
 print "HMM after training:"
 print model
 
-with open ( '../Data/Trained_HMM/trained.txt', 'w' ) as file:
+with open ( '../Data/HMMs/trained.txt', 'w' ) as file:
     model.write( file )
 
 '''
