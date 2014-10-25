@@ -10,6 +10,7 @@ single molecules.
 import numpy as np
 import random
 
+'''
 ## Import of Model, build_profile, parse_abf, and analyze_event
 import sys, argparse
 
@@ -24,6 +25,7 @@ if args['substep']:
 else:
     print '\n-=SIMPLE=-'
     from Simple_Model import *
+'''
 
 ## Methods
 
@@ -141,7 +143,7 @@ def ind_consensus( contexts, labels, cscore=0.9):
     
     return soft_call, hard_call
 
-def hmm_consensus( indices, ems, obs_len ):
+def hmm_consensus( indices, ems, obs_len, chunk_vector ):
     ''' full consensus '''
     
     pseudo_contexts = [ [ None, [x for x in xrange(obs_len) ] ] ]
@@ -186,7 +188,7 @@ def call( C, L ):
 #  		End of Functions		#
 #								#
 #################################
-
+'''
 print '\n-=Building Profile=-'
 profile = build_profile()
 
@@ -216,7 +218,6 @@ for file in files:
         
         ## If event passes Event Filter Score
         if fscore > .5:
-            
             
             ## Partition the event into 'chunks' of context / label regions
             contexts, labels = partition_event( indices, event, ems, means)
@@ -269,15 +270,8 @@ for file in files:
                 print 'HMM Consensus: {:<11} Hard Call: {:<4}, Label: {}'.format( round(hchunk,4), hcall[0], hcall[1] ) 
                 if hcall[0] == hcall[1]:
                     bins['h'] += 1
-                
-                '''
-                print '-=Contexts=-'
-                for i in contexts:
-                    print i[0], i[1], i[2][0], '...', i[2][-1]
-                print '-=Labels=-'
-                for i in labels:
-                    print i[0], i[1], i[2][0], '...', i[2][-1]
-                '''
+
 
 print counter
 print bins
+'''
