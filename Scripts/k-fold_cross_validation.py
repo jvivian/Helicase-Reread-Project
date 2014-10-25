@@ -6,8 +6,8 @@ This script will perform k-fold cross-validation with our training set of JSON e
 
 
 1. Randomize 230 events into 5 groups of 46 events
-2. Read in HMM
-3. For every group: train on the other 4 sets
+2. For every group: train on the other 4 sets
+3. Read in HMM, Train
 4. Test on the withheld group
 3. Return Hard and Softcalls for each method:
     F_h, F_s, L_h, L_s, ... ( Method_hard/soft )
@@ -24,7 +24,7 @@ Currently on:  Step 5
 import sys, os, random
 import numpy as np
 import Methods
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
 sys.path.append( '../Models' )
 from Simple_Model import *
@@ -42,17 +42,14 @@ random.shuffle( events )
 
 # Break into 5 equal groups
 events = [ events[i::5] for i in xrange(5) ]
-
-## 2. Read in Untrained HMM
-with open ( '../Data/HMMs/untrained.txt', 'r' ) as file:
-    model = Model.read( file ) 
     
-## 3. For every group: withold and train on other 4. 
+## 2. For every group: withold and train on other 4. 
 # Create array
 data = np.zeros( (5, 12) ) 
 
 ## This would be the place to do another iteration by filter score: 
 cscore = 0.5
+counters = []
 for i in xrange(5):
     counter = 0
     
@@ -68,6 +65,9 @@ for i in xrange(5):
             means = [seg['mean'] for seg in event.segments]
             sequences.append( means )
     
+    ## 3. Read in Untrained HMM then train
+    with open ( '../Data/HMMs/untrained.txt', 'r' ) as file:
+        model = Model.read( file ) 
     print '\nTraining HMM: Witholding group {}. Training size {}'.format( i+1, len(training) )
     model.train( sequences )
 
@@ -158,6 +158,9 @@ for i in xrange(5):
     data[i][10] = bins['i']*1.0 / counter
     data[i][11] = np.mean(soft_calls['i'])
     
-print '\n', data, '\nSample Size: {}'.format( counter )
+    print counter
+    counters.append( counter )
+    
+print '\n', data, '\nSample Size: ~{}'.format( np.mean(counters) )
 
-np.savetxt( '../Data/Results/Trained_' + str(counter) + '_cscore_5.txt', data, delimiter = ',' )
+np.savetxt( '../Data/Results/Trained_' + str(np.floor(np.mean(counters))) + '_cscore_5.txt', data, delimiter = ',' )
