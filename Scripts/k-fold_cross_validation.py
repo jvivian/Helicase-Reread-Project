@@ -39,7 +39,6 @@ else:
 
 
 ## 1. Randomize 230 events into 5 groups of 46 events
-
 # Find JSON Events 
 source = '../Data/JSON'
 for root, dirnames, filenames in os.walk(source):
@@ -55,9 +54,8 @@ events = [ events[i::5] for i in xrange(5) ]
 # Create array
 data = np.zeros( (5, 12) ) 
 
-## This would be the place to do another iteration by filter score: 
-#cscore = 0.9
-cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1 ]
+## Iterate through the range of cutoff values: 
+cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
 for cscore in cscores:
     counters = []
     for i in xrange(5):
@@ -78,8 +76,8 @@ for cscore in cscores:
         ## 3. Read in Untrained HMM then train
         with open ( '../Data/HMMs/untrained.txt', 'r' ) as file:
             model = Model.read( file ) 
-        print '\nTraining HMM: Witholding group {}. Training size {}'.format( i+1, len(training) )
-        model.train( sequences )
+        print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
+        #model.train( sequences )
 
         ## 4. Test on the withheld group
         # Acquire indices
@@ -170,9 +168,10 @@ for cscore in cscores:
             data[i][11] = np.mean(soft_calls['i'])
         
         print counter
+        print bins
         counters.append( counter )
         
     print '\n', data, '\nSample Size: ~{}'.format( np.mean(counters) )
 
-    np.savetxt( '../Data/Results/1chunk_' + str(np.floor(np.mean(counters))) \
+    np.savetxt( '../Data/Results/Untrained_1chunk_' + str(np.floor(np.mean(counters))) \
                 + '_cscore_'+ str(cscore).split('.')[1] + '.txt', data, delimiter = ',' )
