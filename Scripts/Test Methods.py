@@ -39,7 +39,7 @@ else:
 cscore = 0.1  
 indices = { state.name: i for i, state in enumerate( model.states ) }
 
-for event in parse_abf('../Data/Training_set/14702001-s01.abf'):
+for event in parse_abf('../Data/Training_set/14721001-s01.abf'):
     
     # Convert JSON to event
     #event = Event.from_json( '../Data/JSON/' + event_name )
@@ -70,7 +70,9 @@ for event in parse_abf('../Data/Training_set/14702001-s01.abf'):
         for i in labels:
             print i[0], i[1]
         
+        distributions, fourmers = build_profile()
+        viterbi(model, event, fourmers)
         segment_ems_plot( model, event, ems)   
         
-        break
+        
     
