@@ -126,6 +126,8 @@ def ind_consensus( contexts, labels, cscore=0.9):
         hmC_prod *= (1 - c[2])
     
     C = [ 1-C_prod, 1-mC_prod, 1-hmC_prod ]
+    # Normalize to sum to 1
+    C = [ c/sum(C) for c in C ]
     
     C_prod, mC_prod, hmC_prod = 1, 1, 1
     
@@ -135,8 +137,10 @@ def ind_consensus( contexts, labels, cscore=0.9):
         mC_prod *= (1 - l[1])
         hmC_prod *= (1 - l[2])
     
-    L = [ 1-C_prod, 1-mC_prod, 1-hmC_prod ]
-    
+    L = [ 1-C_prod, 1-mC_prod, 1-hmC_prod ]\
+    # Normalize to sum to 1
+    L = [ l/sum(L) for l in L ]
+
     soft_call = C[0]*L[0] + C[1]*L[1] + C[2]*L[2]
     
     hard_call = call( C, L )
