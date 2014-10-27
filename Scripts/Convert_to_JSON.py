@@ -4,19 +4,15 @@
 import sys, os
 
 sys.path.append( '../Models' )
-
 from Simple_Model import *
 
-
-
 ## Find .abfs
-source = '../Data/Train'
+source = '../Data/Training_set'
 files = []
 for root, dirnames, filenames in os.walk(source):
     files = filenames
 
 print files
-
 
 print '\n-=Building Profile=-'
 profile = build_profile()
@@ -41,8 +37,11 @@ for file in files:
         fscore = data['Score']
         
         ## If event passes Event Filter Score
-        if fscore > .5:
-        
+        if fscore > 0.5:
+            
+            file.to_json( '../Data/JSON/' + file.split('-')[0] + '.json' )
+            
+            '''
             ## Partition the event into 'chunks' of context / label regions
             contexts, labels = partition_event( indices, event, ems, means)
             
@@ -51,7 +50,9 @@ for file in files:
             
             ## Get chunk vector
             contexts, labels = chunk_vector( indices, contexts, labels, ems )
-            
-            if max( [ x[0] for x in contexts ] ) >= 0.5 and max( [ x[0] for x in labels ] ) >= 0.5:
-                
-                event.to_json ( '../Data/JSON/' + file.split('-')[0] + '-' + str(round(event.start,2)) +'.json' )
+            try:
+                if max( [ x[0] for x in contexts ] ) >= 0 and max( [ x[0] for x in labels ] ) >= 0:
+                    event.to_json ( '../Data/JSON/' + file.split('-')[0] + '-' + str(round(event.start,2)) +'.json' )
+            except:
+                pass
+            '''
