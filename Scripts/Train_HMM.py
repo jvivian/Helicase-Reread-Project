@@ -1,12 +1,21 @@
 #!usr/bin/env python2.7
 # John Vivian
 
-import sys, os, random
+import sys, os, random, argparse
+import numpy as np
+import Methods
+
+parser = argparse.ArgumentParser(description='Can run either simple or substep model')
+parser.add_argument('-s','--substep', action='store_true', help='Imports substep model instead of simple')
+args = vars(parser.parse_args())
 
 sys.path.append( '../Models' )
-
-from Simple_Model import *
-
+if args['substep']:
+    print '\n-=SUBSTEP=-'
+    from Substep_Model import *
+else:
+    print '\n-=SIMPLE=-'
+    from Simple_Model import *
 
 ## Find .JSON Events
 source = '../Data/JSON'
@@ -30,7 +39,7 @@ model = Hel308_model( profile[0], 'PW-31', profile[1] )
 
 print 'HMM before training'
 print model
-with open ( '../Data/HMMs/untrained.txt', 'w' ) as file:
+with open ( '../Data/HMMs/untrained_substep.txt', 'w' ) as file:
     model.write( file )
 
 print 'Training HMM'
