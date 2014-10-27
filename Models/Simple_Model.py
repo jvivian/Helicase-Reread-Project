@@ -545,13 +545,13 @@ def partition_event( indices, event, ems, means ):
     C_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(7, 12) ]
     L_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(17, 22) ]
     
-     ## Get the index values for each name in the fork / label
+    ## Get the index values for each name in the fork / label
     C_all = np.array( map( indices.__getitem__, C_fork ) )
     L_all = np.array( map( indices.__getitem__, L_fork ) )
     
     ## Use those index values to compute probabilities by observation
     pC_all = np.exp( ems[ :, C_all ] ).sum( axis=1 )
-    pL_all = np.exp( ems[:, L_all ] ).sum( axis=1 )
+    pL_all = np.exp( ems[ :, L_all ] ).sum( axis=1 )
     
     ## Partition Events given emission matrix
     contexts, labels = [], []
@@ -597,7 +597,7 @@ def chunk_score( indices, contexts, labels, ems ):
     p_dict = OrderedDict()
     pscore = []
     context_final = []
-    weights = [ 1.0/9, 2.0/9, 1.0/3, 2.0/9, 1.0/9 ]
+    #weights = [ 1.0/9, 2.0/9, 1.0/3, 2.0/9, 1.0/9 ]
     for c in contexts:
         temp_ems = ems[ c, : ]                   # Slice matrix based on observations
         for i in xrange(7,12):
@@ -605,17 +605,16 @@ def chunk_score( indices, contexts, labels, ems ):
         
         ## Combine P_scores into a single score
         pscore = [ p_dict[x] for x in p_dict ] 
-        pscore = [ a*b for a,b in izip(pscore, weights) ]
-        pscore = sum(pscore)
+        #pscore = [ a*b for a,b in izip(pscore, weights) ]
+        pscore = np.product(pscore)
         
-        #if pscore > 0.9:
         context_final.append( (round(pscore,4), c) )
     
     ## Obtain Prior for each Label ##
     p_dict = OrderedDict()
     pscore = []
     label_final = []
-    weights = [1.0/11, 2.0/11, 3.0/11, 3.0/11, 2.0/11]
+    #weights = [1.0/11, 2.0/11, 3.0/11, 3.0/11, 2.0/11]
     for l in labels:
         temp_ems = ems[ l, : ]
         for i in xrange( 17, 22):
@@ -623,8 +622,8 @@ def chunk_score( indices, contexts, labels, ems ):
         
         ## Combine P_scores into a single score
         pscore = [p_dict[x] for x in p_dict]
-        pscore = [a*b for a,b in izip(pscore, weights) ]
-        pscore = sum(pscore)
+        #pscore = [a*b for a,b in izip(pscore, weights) ]
+        pscore = np.product(pscore)
         
         #if pscore > 0.9:
         label_final.append( (round(pscore,4), l) )
