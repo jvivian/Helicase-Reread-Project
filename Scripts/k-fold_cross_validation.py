@@ -57,6 +57,7 @@ data = np.zeros( (5, 12) )
 ## Iterate through the range of cutoff values: 
 cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
 for cscore in cscores:
+
     counters = []
     for i in xrange(5):
         counter = 0
@@ -77,7 +78,7 @@ for cscore in cscores:
         with open ( '../Data/HMMs/untrained.txt', 'r' ) as file:
             model = Model.read( file ) 
         print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
-        #model.train( sequences )
+        model.train( sequences )
 
         ## 4. Test on the withheld group
         # Acquire indices
@@ -85,8 +86,8 @@ for cscore in cscores:
         # Bins to hold counts
         bins = { 'f': 0, 'l': 0, 'r':0, 'b': 0, 'i': 0, 'h': 0 }                # Counter for hard calls
         soft_calls = { 'f': [], 'l': [], 'r':[], 'b': [], 'i': [], 'h': [] }    # Will hold soft calls
+        
         for event in test:
-       
             # Convert JSON to event
             event = Event.from_json( '../Data/JSON/' + event )
             
@@ -105,10 +106,11 @@ for cscore in cscores:
             # Get chunk vector
             contexts, labels = chunk_vector( indices, contexts, labels, ems )
             
+            # Filter by chunk score
             contexts = [ x for x in contexts if x[0] >= cscore ]     
             labels = [ x for x in labels if x[0] >= cscore ]
             
-            if len(contexts) > 0 and len(labels) > 0:       ## For this analysis, there must be greater than 2 contexts
+            if len(contexts) > 1 and len(labels) > 0:       ## For this analysis, there must be greater than 2 contexts
                 counter += 1
                 ## Single Read Methods
                 fchunk, fcall = Methods.first_chunk( contexts, labels, cscore )
@@ -120,34 +122,34 @@ for cscore in cscores:
                 ichunk, icall = Methods.ind_consensus( contexts, labels, cscore )
                 hchunk, hcall = Methods.hmm_consensus( indices, ems, len(means), chunk_vector )
 
-                #print '-=Single Read Methods=-'
-                #print 'First Chunk: {:<11} Hard Call: {:<4}, Label: {}'.format( round(fchunk,4), fcall[0], fcall[1] )
+                #-=Single Read Methods=-
+                # First Chunk
                 soft_calls['f'].append( fchunk )
                 if fcall[0] == fcall[1]:
                     bins['f'] += 1
 
-                #print 'Last Chunk: {:<11} Hard Call: {:<4}, label: {}'.format( round(lchunk,4), lcall[0], lcall[1] )
+                # Last Chunk
                 soft_calls['l'].append( lchunk )
                 if lcall[0] == lcall[1]:
                     bins['l'] += 1
                     
-                #print 'Random Chunk: {:<11} Hard Call: {:<4}, Label: {}'.format( round(rchunk,4), rcall[0], rcall[1] )
+                # Random Chunk
                 soft_calls['r'].append( rchunk )
                 if rcall[0] == rcall[1]:
                     bins['r'] += 1
                 
-                #print '-=Multi-Read Methods=-'
-                #print 'Best Chunk: {:<11} Hard Call: {:<4}, Label: {}'.format( round(bchunk,4), bcall[0], bcall[1] )
+                #-=Multi-Read Methods=-
+                # Best Chunk
                 soft_calls['b'].append( bchunk )
                 if bcall[0] == bcall[1]:
                     bins['b'] += 1
                     
-                #print 'Ind Consensus: {:<11} Hard Call: {:<4}, Label: {}'.format( round(ichunk,4), icall[0], icall[1] ) 
+                #Ind Consensus
                 soft_calls['i'].append( ichunk )
                 if icall[0] == icall[1]:
                     bins['i'] += 1
                     
-                #print 'HMM Consensus: {:<11} Hard Call: {:<4}, Label: {}'.format( round(hchunk,4), hcall[0], hcall[1] ) 
+                #HMM Consensus
                 soft_calls['h'].append( hchunk )
                 if hcall[0] == hcall[1]:
                     bins['h'] += 1
@@ -170,8 +172,9 @@ for cscore in cscores:
         print counter
         print bins
         counters.append( counter )
-        
+    
     print '\n', data, '\nSample Size: ~{}'.format( np.mean(counters) )
 
-    np.savetxt( '../Data/Results/Untrained_1chunk_' + str(np.floor(np.mean(counters))) \
+    np.savetxt( '../Data/Results/Trained_2chunk_Mean_' + str(np.floor(np.mean(counters))) \
                 + '_cscore_'+ str(cscore).split('.')[1] + '.txt', data, delimiter = ',' )
+                
