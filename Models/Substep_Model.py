@@ -548,7 +548,7 @@ def partition_event( indices, event, ems, means ):                      ## Fixed
     C_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(10, 18) ]
     L_fork = [ x for x in forks if int(x.split(':')[1]) in xrange(24, 34) ]
     
-     ## Get the index values for each name in the fork / label
+    ## Get the index values for each name in the fork / label
     C_all = np.array( map( indices.__getitem__, C_fork ) )
     L_all = np.array( map( indices.__getitem__, L_fork ) )
     
