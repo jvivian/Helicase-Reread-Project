@@ -48,23 +48,23 @@ for root, dirnames, filenames in os.walk(source):
 random.shuffle( events )
 
 # Break into 5 equal groups
-events = [ events[i::5] for i in xrange(5) ]
+event_groups = [ events[i::5] for i in xrange(5) ]
     
 ## 2. For every group: withold and train on other 4. 
 # Create array
-data = np.zeros( (5, 12) ) 
+data = np.zeros( (1, 12) ) 
 
 ## Iterate through the range of cutoff values: 
 cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
 for cscore in cscores:
 
     counters = []
-    for i in xrange(5):
+    for i in xrange(1): # 5 for real k-fold
         counter = 0
         
         # Separate into Training and Test sets.
-        test = events[i]
-        training = [x for x in events if x != test]
+        test = event_groups[i]
+        training = [x for x in event_groups if x != test]
         
         # Convert training set into sequences
         sequences = []
@@ -78,7 +78,7 @@ for cscore in cscores:
         with open ( '../Data/HMMs/untrained.txt', 'r' ) as file:
             model = Model.read( file ) 
         print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
-        model.train( sequences )
+        #model.train( sequences )
 
         ## 4. Test on the withheld group
         # Acquire indices
@@ -87,7 +87,7 @@ for cscore in cscores:
         bins = { 'f': 0, 'l': 0, 'r':0, 'b': 0, 'i': 0, 'h': 0 }                # Counter for hard calls
         soft_calls = { 'f': [], 'l': [], 'r':[], 'b': [], 'i': [], 'h': [] }    # Will hold soft calls
         
-        for event in test:
+        for event in events:
             # Convert JSON to event
             event = Event.from_json( '../Data/JSON/' + event )
             
@@ -107,52 +107,53 @@ for cscore in cscores:
             contexts, labels = chunk_vector( indices, contexts, labels, ems )
             
             # Filter by chunk score
-            contexts = [ x for x in contexts if x[0] >= cscore ]     
-            labels = [ x for x in labels if x[0] >= cscore ]
+            contexts = [ x for x in contexts if x[0] >= 0.1 ]     
+            labels = [ x for x in labels if x[0] >= 0.1 ]
             
-            if len(contexts) > 1 and len(labels) > 0:       ## For this analysis, there must be greater than 2 contexts
-                counter += 1
-                ## Single Read Methods
-                fchunk, fcall = Methods.first_chunk( contexts, labels, cscore )
-                lchunk, lcall = Methods.last_chunk( contexts, labels, cscore )
-                rchunk, rcall = Methods.random_chunk( contexts, labels, cscore )
-                
-                ## Multi-Read Methods
-                bchunk, bcall = Methods.best_chunk( contexts, labels )
-                ichunk, icall = Methods.ind_consensus( contexts, labels, cscore )
-                hchunk, hcall = Methods.hmm_consensus( indices, ems, len(means), chunk_vector )
+            if len(contexts) > 0 and len(labels) > 0:
+                if max( [ x[0] for x in contexts ] ) >= cscore and max( [ x[0] for x in labels ] ) >= cscore:   
+                    counter += 1
+                    ## Single Read Methods
+                    fchunk, fcall = Methods.first_chunk( contexts, labels, cscore )
+                    lchunk, lcall = Methods.last_chunk( contexts, labels, cscore )
+                    rchunk, rcall = Methods.random_chunk( contexts, labels, cscore )
+                    
+                    ## Multi-Read Methods
+                    bchunk, bcall = Methods.best_chunk( contexts, labels )
+                    ichunk, icall = Methods.ind_consensus( contexts, labels, cscore )
+                    hchunk, hcall = Methods.hmm_consensus( indices, ems, len(means), chunk_vector )
 
-                #-=Single Read Methods=-
-                # First Chunk
-                soft_calls['f'].append( fchunk )
-                if fcall[0] == fcall[1]:
-                    bins['f'] += 1
+                    #-=Single Read Methods=-
+                    # First Chunk
+                    soft_calls['f'].append( fchunk )
+                    if fcall[0] == fcall[1]:
+                        bins['f'] += 1
 
-                # Last Chunk
-                soft_calls['l'].append( lchunk )
-                if lcall[0] == lcall[1]:
-                    bins['l'] += 1
+                    # Last Chunk
+                    soft_calls['l'].append( lchunk )
+                    if lcall[0] == lcall[1]:
+                        bins['l'] += 1
+                        
+                    # Random Chunk
+                    soft_calls['r'].append( rchunk )
+                    if rcall[0] == rcall[1]:
+                        bins['r'] += 1
                     
-                # Random Chunk
-                soft_calls['r'].append( rchunk )
-                if rcall[0] == rcall[1]:
-                    bins['r'] += 1
-                
-                #-=Multi-Read Methods=-
-                # Best Chunk
-                soft_calls['b'].append( bchunk )
-                if bcall[0] == bcall[1]:
-                    bins['b'] += 1
-                    
-                #Ind Consensus
-                soft_calls['i'].append( ichunk )
-                if icall[0] == icall[1]:
-                    bins['i'] += 1
-                    
-                #HMM Consensus
-                soft_calls['h'].append( hchunk )
-                if hcall[0] == hcall[1]:
-                    bins['h'] += 1
+                    #-=Multi-Read Methods=-
+                    # Best Chunk
+                    soft_calls['b'].append( bchunk )
+                    if bcall[0] == bcall[1]:
+                        bins['b'] += 1
+                        
+                    #Ind Consensus
+                    soft_calls['i'].append( ichunk )
+                    if icall[0] == icall[1]:
+                        bins['i'] += 1
+                        
+                    #HMM Consensus
+                    soft_calls['h'].append( hchunk )
+                    if hcall[0] == hcall[1]:
+                        bins['h'] += 1
                     
         ## Add results to array
         if counter > 0:
@@ -175,6 +176,6 @@ for cscore in cscores:
     
     print '\n', data, '\nSample Size: ~{}'.format( np.mean(counters) )
 
-    np.savetxt( '../Data/Results/Trained_2chunk_Mean_' + str(np.floor(np.mean(counters))) \
+    np.savetxt( '../Data/Results/Untrained_1chunk_Fullset_' + str(np.floor(np.mean(counters))) \
                 + '_cscore_'+ str(cscore).split('.')[1] + '.txt', data, delimiter = ',' )
                 
