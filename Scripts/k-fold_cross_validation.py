@@ -107,53 +107,58 @@ for cscore in cscores:
             contexts, labels = chunk_vector( indices, contexts, labels, ems )
             
             # Filter by chunk score
-            contexts = [ x for x in contexts if x[0] >= 0.1 ]     
-            labels = [ x for x in labels if x[0] >= 0.1 ]
+            if cscore == 0.0:
+                contexts = [ x for x in contexts if x[0] >= 0.0 ]     
+                labels = [ x for x in labels if x[0] >= 0.0 ]
+            else:
+                contexts = [ x for x in contexts if x[0] >= 0.1 ]     
+                labels = [ x for x in labels if x[0] >= 0.1 ]
             
-            if len(contexts) > 0 and len(labels) > 0:
+            if contexts and labels:
                 if max( [ x[0] for x in contexts ] ) >= cscore and max( [ x[0] for x in labels ] ) >= cscore:   
-                    counter += 1
-                    ## Single Read Methods
-                    fchunk, fcall = Methods.first_chunk( contexts, labels, cscore )
-                    lchunk, lcall = Methods.last_chunk( contexts, labels, cscore )
-                    rchunk, rcall = Methods.random_chunk( contexts, labels, cscore )
-                    
-                    ## Multi-Read Methods
-                    bchunk, bcall = Methods.best_chunk( contexts, labels )
-                    ichunk, icall = Methods.ind_consensus( contexts, labels, cscore )
-                    hchunk, hcall = Methods.hmm_consensus( indices, ems, len(means), chunk_vector )
+                    if len(contexts) > 0 and len(labels) > 0:   
+                        counter += 1
+                        ## Single Read Methods
+                        fchunk, fcall = Methods.first_chunk( contexts, labels, cscore )
+                        lchunk, lcall = Methods.last_chunk( contexts, labels, cscore )
+                        rchunk, rcall = Methods.random_chunk( contexts, labels, cscore )
+                        
+                        ## Multi-Read Methods
+                        bchunk, bcall = Methods.best_chunk( contexts, labels )
+                        ichunk, icall = Methods.ind_consensus( contexts, labels, cscore )
+                        hchunk, hcall = Methods.hmm_consensus( indices, ems, len(means), chunk_vector )
 
-                    #-=Single Read Methods=-
-                    # First Chunk
-                    soft_calls['f'].append( fchunk )
-                    if fcall[0] == fcall[1]:
-                        bins['f'] += 1
+                        #-=Single Read Methods=-
+                        # First Chunk
+                        soft_calls['f'].append( fchunk )
+                        if fcall[0] == fcall[1]:
+                            bins['f'] += 1
 
-                    # Last Chunk
-                    soft_calls['l'].append( lchunk )
-                    if lcall[0] == lcall[1]:
-                        bins['l'] += 1
+                        # Last Chunk
+                        soft_calls['l'].append( lchunk )
+                        if lcall[0] == lcall[1]:
+                            bins['l'] += 1
+                            
+                        # Random Chunk
+                        soft_calls['r'].append( rchunk )
+                        if rcall[0] == rcall[1]:
+                            bins['r'] += 1
                         
-                    # Random Chunk
-                    soft_calls['r'].append( rchunk )
-                    if rcall[0] == rcall[1]:
-                        bins['r'] += 1
-                    
-                    #-=Multi-Read Methods=-
-                    # Best Chunk
-                    soft_calls['b'].append( bchunk )
-                    if bcall[0] == bcall[1]:
-                        bins['b'] += 1
-                        
-                    #Ind Consensus
-                    soft_calls['i'].append( ichunk )
-                    if icall[0] == icall[1]:
-                        bins['i'] += 1
-                        
-                    #HMM Consensus
-                    soft_calls['h'].append( hchunk )
-                    if hcall[0] == hcall[1]:
-                        bins['h'] += 1
+                        #-=Multi-Read Methods=-
+                        # Best Chunk
+                        soft_calls['b'].append( bchunk )
+                        if bcall[0] == bcall[1]:
+                            bins['b'] += 1
+                            
+                        #Ind Consensus
+                        soft_calls['i'].append( ichunk )
+                        if icall[0] == icall[1]:
+                            bins['i'] += 1
+                            
+                        #HMM Consensus
+                        soft_calls['h'].append( hchunk )
+                        if hcall[0] == hcall[1]:
+                            bins['h'] += 1
                     
         ## Add results to array
         if counter > 0:
