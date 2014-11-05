@@ -54,6 +54,9 @@ event_groups = [ events[i::5] for i in xrange(5) ]
 # Create array
 data = np.zeros( (1, 12) ) 
 
+## Keep track of hard calls -- list with 'n' and 'correct'
+hard_calls = { 'C': [0, 0], 'mC' : [0,0], 'hmC' : [0,0] }
+
 ## Iterate through the range of cutoff values: 
 cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
 for cscore in cscores:
@@ -152,8 +155,17 @@ for cscore in cscores:
                             
                         #Ind Consensus
                         soft_calls['i'].append( ichunk )
+                        
+                        ## Increment count for hard calls
+                        hard_calls[ icall[1] ][0] += 1  # increment 'n' count
+                        
                         if icall[0] == icall[1]:
                             bins['i'] += 1
+                            
+                            ## Increment count for hard calls
+                            hard_calls[ icall[0] ][1] += 1 # Increment correct count
+                            
+                            
                             
                         #HMM Consensus
                         soft_calls['h'].append( hchunk )
@@ -183,4 +195,6 @@ for cscore in cscores:
 
     np.savetxt( '../Data/Results/Untrained_1chunk_Fullset_' + str(np.floor(np.mean(counters))) \
                 + '_cscore_'+ str(cscore).split('.')[1] + '.txt', data, delimiter = ',' )
-                
+    
+    for i in hard_calls:
+        print i, 'n: {}, Correct: {}'.format( hard_calls[i][0], hard_calls[i][1] ) 
