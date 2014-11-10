@@ -54,12 +54,11 @@ event_groups = [ events[i::5] for i in xrange(5) ]
 # Create array
 data = np.zeros( (1, 12) ) 
 
-## Keep track of hard calls -- list with 'n' and 'correct'
-hard_calls = { 'C': [0, 0], 'mC' : [0,0], 'hmC' : [0,0] }
-
 ## Iterate through the range of cutoff values: 
 cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
 for cscore in cscores:
+    ## Keep track of hard calls -- list with 'n' and 'correct'
+    hard_calls = { 'C': [0, 0], 'mC' : [0,0], 'hmC' : [0,0] }
 
     counters = []
     for i in xrange(1): # 5 for real k-fold
