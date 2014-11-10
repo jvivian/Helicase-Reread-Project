@@ -227,6 +227,7 @@ def build_profile( ):
     Profile is stored as a list of distributions with forks represented by dictionaries.
     '''
     profile, dists = [], {}
+    C, mC, hmC = [], [], []
     data = pd.read_excel( '../Profile/CCGG.xlsx', 'Sheet3' )
 
     total_means, total_stds = data.mean(axis=0), data.std(axis=0) # Total Profile Man
@@ -240,27 +241,36 @@ def build_profile( ):
     # Piecing the profile together (0-3) = states 1-4
     for i in xrange(6):
         profile.append(total[i])
+        C.append( total[i] ); mC.append( total[i] ); hmC.append( total[i] )
 
     # Cytosine fork (6-10) = states 7-11
     for i in xrange(6, 11):
         profile.append( {'C': dists['C'][i], 'mC': dists['mC'][i], 'hmC': dists['hmC'][i]  })
+        C.append( dists['C'][i] )
+        mC.append( dists['mC'][i] )
+        hmC.append( dists['hmC'][i] )
 
     # Continuation of profile  (11-15) = states 12-16
     for i in xrange(11, 16):
         profile.append(total[i])
+        C.append( total[i] ); mC.append( total[i] ); hmC.append( total[i] )
 
     # Label Fork (16-20) = states 17-21
     for i in xrange(16,21):
         profile.append( {'C': dists['C'][i], 'mC': dists['mC'][i], 'hmC': dists['hmC'][i]  })
+        C.append( dists['C'][i] )
+        mC.append( dists['mC'][i] )
+        hmC.append( dists['hmC'][i] )
 
     # Continuation of profile  (21-27) = states 22-28
     for i in xrange(21, 32):
         profile.append(total[i])
+        C.append( total[i] ); mC.append( total[i] ); hmC.append( total[i] )
         
     fourmers = [ col.replace(' ', '_').replace('.1', '').replace('.2', '') for col in data ][1:] 
     fourmers = [a.encode('ascii', 'ignore') for a in fourmers]
 
-    return profile, fourmers
+    return profile, fourmers, C, mC, hmC
 
 def parse_abf(abf, start=0, end=750):
     '''
