@@ -22,7 +22,7 @@ else:
 ################################
 
 print '\n-=Building Profile=-'
-distributions, fourmers = build_profile()
+distributions, fourmers, C, mC, hmC = build_profile()
 
 print '-=Building HMM=-'
 if args['substep']:
@@ -31,7 +31,7 @@ else:
     model = Hel308_model( distributions, 'Test-31', fourmers )
 
 print '-=Parsing ABF=-'
-for event in parse_abf('../Data/Mixed/14716003-s01.abf', 102, 103 ):
+for event in parse_abf('../Data/Training_Set/14702001-s01.abf' ):
     
     print '-=Determining Viterbi Path=-'
     viterbi(model, event, fourmers)
