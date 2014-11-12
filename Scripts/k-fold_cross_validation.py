@@ -77,7 +77,7 @@ for cscore in cscores:
                 sequences.append( means )
         
         ## 3. Read in Untrained HMM then train
-        with open ( '../Data/HMMs/untrained.txt', 'r' ) as file:
+        with open ( '../Data/HMMs/Pseudo-Trained.txt', 'r' ) as file:
             model = Model.read( file ) 
         print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
         #model.train( sequences )
@@ -89,9 +89,9 @@ for cscore in cscores:
         bins = { 'f': 0, 'l': 0, 'r':0, 'b': 0, 'i': 0, 'h': 0 }                # Counter for hard calls
         soft_calls = { 'f': [], 'l': [], 'r':[], 'b': [], 'i': [], 'h': [] }    # Will hold soft calls
         
-        for event in events:
+        for event_name in events:
             # Convert JSON to event
-            event = Event.from_json( '../Data/JSON/' + event )
+            event = Event.from_json( '../Data/JSON/' + event_name )
             
             # Convert event into a list of means
             means = [seg['mean'] for seg in event.segments]
@@ -170,7 +170,8 @@ for cscore in cscores:
                         soft_calls['h'].append( hchunk )
                         if hcall[0] == hcall[1]:
                             bins['h'] += 1
-                    
+                        
+                        print event_name, icall[1], icall[0]
         ## Add results to array
         if counter > 0:
             data[i][0] = bins['f']*1.0 / counter
@@ -190,9 +191,9 @@ for cscore in cscores:
         print bins
         counters.append( counter )
     
-    print '\n', data, '\nSample Size: ~{}'.format( np.mean(counters) )
+    #print '\n', data, '\nSample Size: ~{}'.format( np.mean(counters) )
 
-    np.savetxt( '../Data/Results/Untrained_1chunk_Fullset_' + str(np.floor(np.mean(counters))) \
+    np.savetxt( '../Data/Results/Pseudotrained_Fullset' + str(np.floor(np.mean(counters))) \
                 + '_cscore_'+ str(cscore).split('.')[1] + '.txt', data, delimiter = ',' )
     
     for i in hard_calls:
