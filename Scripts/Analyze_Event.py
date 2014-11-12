@@ -7,6 +7,7 @@ import sys, argparse
 
 parser = argparse.ArgumentParser(description='Can run either simple or substep model')
 parser.add_argument('-s','--substep', action='store_true', help='Imports substep model')
+parser.add_argument('-p', '--pseudo', action='store_true', help='Imports pseudo-trained model')
 args = vars(parser.parse_args())
 
 sys.path.append( '../Models' )
@@ -27,11 +28,15 @@ distributions, fourmers, C, mC, hmC = build_profile()
 print '-=Building HMM=-'
 if args['substep']:
     model = Hel308_model( distributions, 'Test-43', fourmers )
+elif args['pseudo']:
+    print 'Pseudo Model'
+    with open ( '../Data/HMMs/Pseudo-Trained.txt', 'r' ) as file:
+        model = Model.read( file ) 
 else:
     model = Hel308_model( distributions, 'Test-31', fourmers )
 
 print '-=Parsing ABF=-'
-for event in parse_abf('../Data/Training_Set/14702001-s01.abf' ):
+for event in parse_abf('../Data/Training_Set/14714002-s01.abf', 475, 476 ):
     
     print '-=Determining Viterbi Path=-'
     viterbi(model, event, fourmers)
@@ -46,9 +51,3 @@ for event in parse_abf('../Data/Training_Set/14702001-s01.abf' ):
     ## Plots
     segment_ems_plot( model, event, ems)   
     
-    '''
-    This is how to SAVE the HMM after you've created/trained it
-    with open( 'test.txt', 'w' ) as file:
-        model.write( file )
-    '''
-
