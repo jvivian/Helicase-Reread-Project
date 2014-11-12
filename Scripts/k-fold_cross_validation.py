@@ -55,7 +55,7 @@ event_groups = [ events[i::5] for i in xrange(5) ]
 data = np.zeros( (1, 12) ) 
 
 ## Iterate through the range of cutoff values: 
-cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
+cscores = [ .9, .85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0.025, 0.01, 0.0 ]
 for cscore in cscores:
     ## Keep track of hard calls -- list with 'n' and 'correct'
     hard_calls = { 'C': [0, 0], 'mC' : [0,0], 'hmC' : [0,0] }
@@ -171,7 +171,7 @@ for cscore in cscores:
                         if hcall[0] == hcall[1]:
                             bins['h'] += 1
                         
-                        print event_name, icall[1], icall[0]
+                        #print event_name, icall[1], icall[0]
         ## Add results to array
         if counter > 0:
             data[i][0] = bins['f']*1.0 / counter
