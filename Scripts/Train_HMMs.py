@@ -45,9 +45,9 @@ C_tset, mC_tset, hmC_tset = [], [], []
 
 print 'Iterating through Events'
 cscore = 0.1 ## This value was used so that each context had a training set of ~50 events.
-for event in events:
+for event_name in events:
 	# Convert JSON to event
-	event = Event.from_json( '../Data/JSON/' + event )
+	event = Event.from_json( '../Data/JSON/' + event_name )
 
 	# Convert event into a list of means
 	means = [seg['mean'] for seg in event.segments]
@@ -77,8 +77,11 @@ for event in events:
 			C_tset.append( means )
 		elif icall[1] == 'mC':
 			mC_tset.append( means )
-		else:
+			print 'Methyl Label Found: {}'.format( event_name )
+		elif icall[1] == 'hmC':
 			hmC_tset.append( means )
+
+		
 
 
 print '\nTraining Cytosine HMM'
@@ -97,7 +100,7 @@ with open( '../Data/HMMs/mC-trained.txt', 'w' ) as file:
 
 print 'Training hmC HMM'
 with open( '../Data/HMMs/hmC-untrained.txt', 'w' ) as file:
-    mC_model.write( file )
+    hmC_model.write( file )
 hmC_model.train( hmC_tset )
 with open( '../Data/HMMs/hmC-trained.txt', 'w' ) as file:
-    mC_model.write( file )
+    hmC_model.write( file )
