@@ -9,3 +9,6 @@
 
 # Ignore .pyc files
 *.pyc
+
+#Ignore Image files needed for ipython notebook
+*.png
