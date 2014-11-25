@@ -17,8 +17,6 @@ This script will perform k-fold cross-validation with our training set of JSON e
 6. Meta: Store each array in a dictionary / 3d array for different filter scores.
 
 
-Currently on:  Step 6
-
 '''
 
 import sys, os, random, argparse
@@ -40,7 +38,7 @@ else:
 
 ## 1. Randomize 230 events into 5 groups of 46 events
 # Find JSON Events 
-source = '../Data/JSON'
+source = '../Data/JSON/Full'
 for root, dirnames, filenames in os.walk(source):
     events = filenames
     
@@ -72,12 +70,12 @@ for cscore in cscores:
         sequences = []
         for group in training:
             for event in group:
-                event = Event.from_json( '../Data/JSON/' + event )
+                event = Event.from_json( '../Data/JSON/Full/' + event )
                 means = [seg['mean'] for seg in event.segments]
                 sequences.append( means )
         
         ## 3. Read in Untrained HMM then train
-        with open ( '../Data/HMMs/Pseudo-Trained.txt', 'r' ) as file:
+        with open ( '../Data/HMMs/profile_trained_no_hmC.txt', 'r' ) as file:
             model = Model.read( file ) 
         print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
         #model.train( sequences )
@@ -91,7 +89,7 @@ for cscore in cscores:
         
         for event_name in events:
             # Convert JSON to event
-            event = Event.from_json( '../Data/JSON/' + event_name )
+            event = Event.from_json( '../Data/JSON/Full/' + event_name )
             
             # Convert event into a list of means
             means = [seg['mean'] for seg in event.segments]
@@ -171,7 +169,7 @@ for cscore in cscores:
                         if hcall[0] == hcall[1]:
                             bins['h'] += 1
                         
-                        #print event_name, 'Label: ', icall[1], 'Context: ', icall[0]
+                        print event_name, 'Label: ', icall[1], 'Context: ', icall[0]
         ## Add results to array
         if counter > 0:
             data[i][0] = bins['f']*1.0 / counter
@@ -193,8 +191,8 @@ for cscore in cscores:
     
     #print '\n', data, '\nSample Size: ~{}'.format( np.mean(counters) )
 
-    np.savetxt( '../Data/Results/Pseudotrained_Fullset' + str(np.floor(np.mean(counters))) \
+    np.savetxt( '../Data/Results/Trained_no_hmC_TEST_' + str(np.floor(np.mean(counters))) \
                 + '_cscore_'+ str(cscore).split('.')[1] + '.txt', data, delimiter = ',' )
-    
+
     for i in hard_calls:
         print i, 'n: {}, Correct: {}'.format( hard_calls[i][0], hard_calls[i][1] ) 

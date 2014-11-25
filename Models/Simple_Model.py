@@ -280,8 +280,8 @@ def parse_abf(abf, start=0, end=750):
 
     ## Parse File
     file = File(abf)
-    file.parse(parser=lambda_event_parser(threshold=108, rules = [ lambda event: event.duration > 1, 
-            lambda event: event.min > -500, lambda event: event.max < 110 ]) )	
+    file.parse(parser=lambda_event_parser(threshold=110, rules = [ lambda event: event.duration > 1, 
+            lambda event: event.min > -500 ]) )	
     print '\tFile: Parsed'
 
     ## Crude Event Filter
@@ -535,7 +535,7 @@ def segment_ems_plot( model, event, ems):
     plt.plot( phmCT, alpha=0.66, label='hmC-Tag', c='k' )
     plt.ylabel( 'Probability' )
     plt.xlabel( 'Sequence Position' )
-    plt.legend()
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     plt.tight_layout()
     plt.show()	

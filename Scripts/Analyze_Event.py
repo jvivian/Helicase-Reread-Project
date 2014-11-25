@@ -30,16 +30,16 @@ if args['substep']:
     model = Hel308_model( distributions, 'Test-43', fourmers )
 elif args['pseudo']:
     print 'Pseudo Model'
-    with open ( '../Data/HMMs/Pseudo-Trained.txt', 'r' ) as file:
+    with open ( '../Data/HMMs/profile_trained_no_hmC.txt', 'r' ) as file:
         model = Model.read( file ) 
 else:
     model = Hel308_model( distributions, 'Test-31', fourmers )
 
 print '-=Parsing ABF=-'
-for event in parse_abf('../Data/Training_Set/14714002-s01.abf', 475, 476 ):
+for event in parse_abf('../Data/Training_Set/14715007-s01.abf', 20, 21):
     
-    print '-=Determining Viterbi Path=-'
-    viterbi(model, event, fourmers)
+    #print '-=Determining Viterbi Path=-'
+    #viterbi(model, event, fourmers)
     
     ## Perform the forward_backward algorithm to return transmission and emission matrices
     means = [seg.mean for seg in event.segments]

@@ -7,12 +7,10 @@ sys.path.append( '../Models' )
 from Simple_Model import *
 
 ## Find .abfs
-source = '../Data/Training_set'
+source = '../Data/Profile_set/mC'
 files = []
 for root, dirnames, filenames in os.walk(source):
     files = filenames
-
-print files
 
 print '\n-=Building Profile=-'
 profile = build_profile()
@@ -39,8 +37,12 @@ for file in files:
         ## If event passes Event Filter Score
         if fscore > 0.5:
             
-            file.to_json( '../Data/JSON/' + file.split('-')[0] + '.json' )
+            event.to_json ( '../Data/JSON/Profile/mC/' + file.split('-')[0] + '-' + str(round(event.start,2)) +'.json' )
+            print '\n\tFile Added: {}'.format( file.split('-')[0] + '-' + str(round(event.start,2)) )
+            data = analyze_event( model, event, trans )
+            segment_ems_plot( model, event, ems)
             
+           
             '''
             ## Partition the event into 'chunks' of context / label regions
             contexts, labels = partition_event( indices, event, ems, means)

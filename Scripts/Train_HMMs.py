@@ -15,10 +15,26 @@ from PyPore.DataTypes import *
 sys.path.append( '../Models' )
 from Simple_Model import *
 
-## Find .JSON Events
+'''
+## 1. Randomize 230 events into groups
+# Find JSON Events 
 source = '../Data/JSON'
 for root, dirnames, filenames in os.walk(source):
-	events = filenames
+    events = filenames
+    
+# Randomize List
+random.shuffle( events )
+
+# Break into equal groups
+event_groups = [ events[i::3] for i in xrange(3) ]
+for i in event_groups:
+	print len(i)
+'''
+
+## Call in Frozen Set of JSONs to trian on
+source = '../Data/JSON/Profile/All'
+for root, dirnames, filenames in os.walk(source):
+    events = filenames
 
 ## Build profiles for HMMs
 print '\n-=Building Profile=-'
@@ -26,28 +42,22 @@ distributions, fourmers, C_profile, mC_profile, hmC_profile = build_profile()
 
 ## Create HMMs 
 print '-=Creating Untrained HMM=-'
-with open ( '../Data/HMMs/untrained.txt', 'r' ) as file:
+with open ( '../Data/HMMs/profile_trained.txt', 'r' ) as file:
 	model = Model.read( file ) 
 	#print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
+
 indices = { state.name: i for i, state in enumerate( model.states ) }
 
-print '-=Creating C HMM=-'
-C_model = Hel308_model( C_profile, 'C-31', fourmers )
+cscore = 0.9 ## This value was used so that each context had a training set of ~50 events.
 
-print '-=Creating mC HMM=-'
-mC_model = Hel308_model( mC_profile, 'mC-31', fourmers)
-
-print '-=Creating hmC HMM=-'
-hmC_model = Hel308_model( hmC_profile, 'hmC-31', fourmers )
-
+print 'Iterating through Training Set: {}'.format( 3 )
 ## Create lists for the sequences to be used in training
-C_tset, mC_tset, hmC_tset = [], [], []
+C_tset, mC_tset, hmC_tset = [], [], [] 
 
-print 'Iterating through Events'
-cscore = 0.1 ## This value was used so that each context had a training set of ~50 events.
 for event_name in events:
+
 	# Convert JSON to event
-	event = Event.from_json( '../Data/JSON/' + event_name )
+	event = Event.from_json( '../Data/JSON/Profile/All/' + event_name )
 
 	# Convert event into a list of means
 	means = [seg['mean'] for seg in event.segments]
@@ -63,7 +73,7 @@ for event_name in events:
 
 	# Get chunk vector
 	contexts, labels = chunk_vector( indices, contexts, labels, ems )
-
+	'''
 	if max( [ x[0] for x in contexts ] ) >= cscore and max( [ x[0] for x in labels ] ) >= cscore:
 		
 		# Filter by min value
@@ -73,16 +83,37 @@ for event_name in events:
 		# Use Independent consensus to determine vector
 		ichunk, icall = Methods.ind_consensus( contexts, labels, cscore )
 
+		# Use label hard call to sort event
 		if icall[1] == 'C':
 			C_tset.append( means )
 		elif icall[1] == 'mC':
 			mC_tset.append( means )
-			print 'Methyl Label Found: {}'.format( event_name )
 		elif icall[1] == 'hmC':
 			hmC_tset.append( means )
 
-		
+		print event_name, icall[1]
+	'''
+	C_tset.append( means )
 
+
+print 'Creating UBER HMM'
+with open( '../Data/HMMs/All_untrained', 'w' ) as file:
+    model.write( file )
+model.train( C_tset )
+with open( '../Data/HMMs/All_trained.txt', 'w' ) as file:
+    model.write( file )
+'''	
+print '-=Creating C HMM=-'
+C_model = Hel308_model( C_profile, 'C-31', fourmers )
+
+print '-=Creating mC HMM=-'
+mC_model = Hel308_model( mC_profile, 'mC-31', fourmers)
+
+#print '-=Creating hmC HMM=-'
+#hmC_model = Hel308_model( hmC_profile, 'hmC-31', fourmers )
+
+print '\nLength of Trained Sets. C: {}, mC: {}, hmC: {}\
+			'.format( len(C_tset), len(mC_tset), len(hmC_tset) )
 
 print '\nTraining Cytosine HMM'
 with open( '../Data/HMMs/C-untrained.txt', 'w' ) as file:
@@ -102,5 +133,6 @@ print 'Training hmC HMM'
 with open( '../Data/HMMs/hmC-untrained.txt', 'w' ) as file:
     hmC_model.write( file )
 hmC_model.train( hmC_tset )
-with open( '../Data/HMMs/hmC-trained.txt', 'w' ) as file:
+with open( '../Data/HMMs/hmC-trained-' + str(3) + '.txt', 'w' ) as file:
     hmC_model.write( file )
+'''
