@@ -5,9 +5,12 @@ import sys, os
 
 sys.path.append( '../Models' )
 from Simple_Model import *
+import Methods
 
-## Find .abfs
-source = '../Data/Profile_set/mC'
+#####################
+#   ABF Path Here   #
+#####################
+source = '../Data/Training_Set/Mixed' 
 files = []
 for root, dirnames, filenames in os.walk(source):
     files = filenames
@@ -15,8 +18,10 @@ for root, dirnames, filenames in os.walk(source):
 print '\n-=Building Profile=-'
 profile = build_profile()
 
-print '-=Building Complete HMM=-'
+print '-=Building HMM from Profile (Untrained)=-'
 model = Hel308_model( profile[0], 'PW-31', profile[1] )
+#with open ( '../Data/HMMs/profile_trained_no_hmC.txt', 'r' ) as file:
+#    model = Model.read( file ) 
 indices = { state.name: i for i, state in enumerate( model.states ) }
 
 for file in files:
@@ -33,28 +38,20 @@ for file in files:
         ## Analyze Event to get a Filter Score
         data = analyze_event( model, event, trans, output=False )
         fscore = data['Score']
-        
-        ## If event passes Event Filter Score
+    
+        ## Crude Filter
         if fscore > 0.5:
-            
-            event.to_json ( '../Data/JSON/Profile/mC/' + file.split('-')[0] + '-' + str(round(event.start,2)) +'.json' )
-            print '\n\tFile Added: {}'.format( file.split('-')[0] + '-' + str(round(event.start,2)) )
-            data = analyze_event( model, event, trans )
-            segment_ems_plot( model, event, ems)
-            
-           
-            '''
-            ## Partition the event into 'chunks' of context / label regions
-            contexts, labels = partition_event( indices, event, ems, means)
-            
-            ## Get chunk scores
-            contexts, labels = chunk_score( indices, contexts, labels, ems )
-            
-            ## Get chunk vector
-            contexts, labels = chunk_vector( indices, contexts, labels, ems )
-            try:
-                if max( [ x[0] for x in contexts ] ) >= 0 and max( [ x[0] for x in labels ] ) >= 0:
-                    event.to_json ( '../Data/JSON/' + file.split('-')[0] + '-' + str(round(event.start,2)) +'.json' )
-            except:
-                pass
-            '''
+
+            segment_ems_plot( model, event, ems)    # Plot of Event
+            choice = raw_input('\nC/M/H (or Enter to pass): ').upper()     # C/M/H or Enter for pass
+            if choice == 'C':
+                event.to_json ( '../Data/JSON/C-' + file.split('-')[0] + '-' + str(round(event.start,2)) +'.json' )
+                print '\n\tC Event Added: {}'.format( file.split('-')[0] + '-' + str(round(event.start,2)) )
+            elif choice == 'M':
+                event.to_json ( '../Data/JSON/mC-' + file.split('-')[0] + '-' + str(round(event.start,2)) +'.json' )
+                print '\n\tmC Event Added: {}'.format( file.split('-')[0] + '-' + str(round(event.start,2)) )
+            elif choice == 'H':
+                event.to_json ( '../Data/JSON/hmC-' + file.split('-')[0] + '-' + str(round(event.start,2)) +'.json' )
+                print '\n\thmC Event Added: {}'.format( file.split('-')[0] + '-' + str(round(event.start,2)) )
+
+print "You're done! Thanks Art -- You da real MVP"
