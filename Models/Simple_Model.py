@@ -536,6 +536,7 @@ def segment_ems_plot( model, event, ems):
     plt.ylabel( 'Probability' )
     plt.xlabel( 'Sequence Position' )
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.ylim( [0, 1.0] )
 
     plt.tight_layout()
     plt.show()	
@@ -693,7 +694,6 @@ def chunk_vector( indices, contexts, labels, ems ):
         vector = []
     
     return context_final, label_final
-
 
 ## Not working / Unneeded ?
 def trans_plot( trans_dict ): 
