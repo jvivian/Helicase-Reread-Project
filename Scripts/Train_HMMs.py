@@ -31,8 +31,8 @@ for i in event_groups:
 	print len(i)
 '''
 
-## Call in Frozen Set of JSONs to trian on
-source = '../Data/JSON/Profile/All'
+## Call in Frozen Set of JSONs to train on
+source = '../Data/JSON/hmC'
 for root, dirnames, filenames in os.walk(source):
     events = filenames
 
@@ -42,13 +42,13 @@ distributions, fourmers, C_profile, mC_profile, hmC_profile = build_profile()
 
 ## Create HMMs 
 print '-=Creating Untrained HMM=-'
-with open ( '../Data/HMMs/profile_trained.txt', 'r' ) as file:
+with open ( '../Data/HMMs/untrained.txt', 'r' ) as file:
 	model = Model.read( file ) 
 	#print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
 
 indices = { state.name: i for i, state in enumerate( model.states ) }
 
-cscore = 0.9 ## This value was used so that each context had a training set of ~50 events.
+#cscore = 0.9 ## This value was used so that each context had a training set of ~50 events.
 
 print 'Iterating through Training Set: {}'.format( 3 )
 ## Create lists for the sequences to be used in training
@@ -57,7 +57,7 @@ C_tset, mC_tset, hmC_tset = [], [], []
 for event_name in events:
 
 	# Convert JSON to event
-	event = Event.from_json( '../Data/JSON/Profile/All/' + event_name )
+	event = Event.from_json( '../Data/JSON/hmC/' + event_name )
 
 	# Convert event into a list of means
 	means = [seg['mean'] for seg in event.segments]
@@ -93,28 +93,25 @@ for event_name in events:
 
 		print event_name, icall[1]
 	'''
-	C_tset.append( means )
+	hmC_tset.append( means )
 
-
-print 'Creating UBER HMM'
-with open( '../Data/HMMs/All_untrained', 'w' ) as file:
+'''
+print 'Creating UBER MODEL (forks)'
+with open( '../Data/HMMs/Complete_Model_Untrained.txt', 'w' ) as file:
     model.write( file )
 model.train( C_tset )
-with open( '../Data/HMMs/All_trained.txt', 'w' ) as file:
+with open( '../Data/HMMs/Complete_Model_Trained.txt', 'w' ) as file:
     model.write( file )
-'''	
+'''
 print '-=Creating C HMM=-'
 C_model = Hel308_model( C_profile, 'C-31', fourmers )
 
 print '-=Creating mC HMM=-'
 mC_model = Hel308_model( mC_profile, 'mC-31', fourmers)
 
-#print '-=Creating hmC HMM=-'
-#hmC_model = Hel308_model( hmC_profile, 'hmC-31', fourmers )
-
-print '\nLength of Trained Sets. C: {}, mC: {}, hmC: {}\
-			'.format( len(C_tset), len(mC_tset), len(hmC_tset) )
-
+print '-=Creating hmC HMM=-'
+hmC_model = Hel308_model( hmC_profile, 'hmC-31', fourmers )
+'''
 print '\nTraining Cytosine HMM'
 with open( '../Data/HMMs/C-untrained.txt', 'w' ) as file:
     C_model.write( file )
@@ -128,11 +125,10 @@ with open( '../Data/HMMs/mC-untrained.txt', 'w' ) as file:
 mC_model.train( mC_tset )
 with open( '../Data/HMMs/mC-trained.txt', 'w' ) as file:
     mC_model.write( file )
-
+'''
 print 'Training hmC HMM'
 with open( '../Data/HMMs/hmC-untrained.txt', 'w' ) as file:
     hmC_model.write( file )
 hmC_model.train( hmC_tset )
-with open( '../Data/HMMs/hmC-trained-' + str(3) + '.txt', 'w' ) as file:
+with open( '../Data/HMMs/hmC-trained.txt', 'w' ) as file:
     hmC_model.write( file )
-'''
