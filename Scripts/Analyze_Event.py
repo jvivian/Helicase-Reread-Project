@@ -39,7 +39,7 @@ print '-=Parsing ABF=-'
 for event in parse_abf('../Data/Training_Set/Mixed/14n13002-s04.abf', 544, 545):
     
     #print '-=Determining Viterbi Path=-'
-    #viterbi(model, event, fourmers)
+    viterbi(model, event, fourmers)
     
     ## Perform the forward_backward algorithm to return transmission and emission matrices
     means = [seg.mean for seg in event.segments]

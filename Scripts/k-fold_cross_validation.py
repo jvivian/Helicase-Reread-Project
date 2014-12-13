@@ -36,7 +36,7 @@ else:
 
 ## 1. Randomize 230 events into 5 groups of 46 events
 # Find JSON Events 
-source = '../Data/JSON/ALL_mixed'
+source = '../Data/JSON/Train/'
 for root, dirnames, filenames in os.walk(source):
     events = filenames
     
@@ -51,7 +51,7 @@ event_groups = [ events[i::5] for i in xrange(5) ]
 data = np.zeros( (1, 12) ) 
 
 ## 3. Read in Untrained HMM then train
-with open ( '../Data/HMMs/Pseudo_Trained.txt', 'r' ) as file:
+with open ( '../Data/HMMs/Temp_Test.txt', 'r' ) as file:
     model = Model.read( file ) 
 #print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
 #model.train( sequences )
@@ -70,7 +70,7 @@ counter = 0
 for event_name in events:  
     counter+=1
     # Convert JSON to event
-    event = Event.from_json( '../Data/JSON/All_mixed/' + event_name )
+    event = Event.from_json( source + event_name )
 
     # Convert event into a list of means
     means = [seg['mean'] for seg in event.segments]
@@ -135,6 +135,7 @@ for cscore in cscores:
             event_name = event[0]
             contexts = event[1]
             labels = event[2]
+            barcode = event_name.split('-')[0]
             # Counter for keeping track of number of events
             counter += 1
             ## Single Read Methods
@@ -150,23 +151,23 @@ for cscore in cscores:
             #-=Single Read Methods=-
             # First Chunk
             soft_calls['f'].append( fchunk )
-            if fcall[0] == fcall[1]:
+            if fcall[0] == barcode:
                 bins['f'] += 1
 
             # Last Chunk
             soft_calls['l'].append( lchunk )
-            if lcall[0] == lcall[1]:
+            if lcall[0] == barcode:
                 bins['l'] += 1
                 
             # Random Chunk
             soft_calls['r'].append( rchunk )
-            if rcall[0] == rcall[1]:
+            if rcall[0] == barcode:
                 bins['r'] += 1
             
             #-=Multi-Read Methods=-
             # Best Chunk
             soft_calls['b'].append( bchunk )
-            if bcall[0] == bcall[1]:
+            if bcall[0] == barcode:
                 bins['b'] += 1
                 
             #Ind Consensus
@@ -175,15 +176,16 @@ for cscore in cscores:
             ## Increment count for hard calls
             hard_calls[ icall[1] ][0] += 1  # increment 'n' count
             
-            if icall[0] == icall[1]:
+            if icall[0] == barcode:
                 bins['i'] += 1
-                
+
                 ## Increment count for hard calls
                 hard_calls[ icall[0] ][1] += 1 # Increment correct count
-                
+            print 'Context_hc: {}\tBarcode: {}\tEvent_Name:{}'.format( icall[0], barcode, event_name )
+             
             #HMM Consensus
             soft_calls['h'].append( hchunk )
-            if hcall[0] == hcall[1]:
+            if hcall[0] == barcode:
                 bins['h'] += 1
             
             #print event_name, 'Label: ', icall[1], 'Context: ', icall[0]
@@ -214,5 +216,7 @@ for cscore in cscores:
     print '\nCscore: {}'.format( cscore )
     for i in hard_calls:
         print i, 'n: {}, Correct: {}'.format( hard_calls[i][0], hard_calls[i][1] ) 
+
+    print data
 
 

@@ -32,7 +32,7 @@ for i in event_groups:
 '''
 
 ## Call in Frozen Set of JSONs to train on
-source = '../Data/JSON/hmC'
+source = '../Data/JSON/hmC_Train/'
 for root, dirnames, filenames in os.walk(source):
     events = filenames
 
@@ -57,7 +57,7 @@ C_tset, mC_tset, hmC_tset = [], [], []
 for event_name in events:
 
 	# Convert JSON to event
-	event = Event.from_json( '../Data/JSON/hmC/' + event_name )
+	event = Event.from_json( source + event_name )
 
 	# Convert event into a list of means
 	means = [seg['mean'] for seg in event.segments]
