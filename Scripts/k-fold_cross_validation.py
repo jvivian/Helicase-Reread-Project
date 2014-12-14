@@ -93,7 +93,7 @@ for event_name in events:
         for i in xrange(9,-1,-1):
             if max_c >= i*.10 and max_l >= i*.10:
                 print 'C:{}\tL:{}\tAssigned:{}\tPercentage:{}%\r'.format(round(max_c,2), round(max_l,2), i, round((counter*1.0/len(events))*100,2)),
-                ranked_events[i].append( (event_name, contexts, labels) )
+                ranked_events[i].append( (event_name, contexts, labels, ems, means) )
                 break
 print '\n'
 for i in ranked_events:
@@ -109,19 +109,7 @@ for cscore in cscores:
     counters = []
     #for i in xrange(1): # 5 for real k-fold
     counter = 0
-    '''
-    # Separate into Training and Test sets.
-    test = event_groups[i]
-    training = [x for x in event_groups if x != test]
-    
-    # Convert training set into sequences
-    sequences = []
-    for group in event_groups:
-        for event in group:
-            event = Event.from_json( '../Data/JSON/Full/' + event )
-            means = [seg['mean'] for seg in event.segments]
-            sequences.append( means )
-    '''
+
     # Bins to hold counts
     bins = { 'f': 0, 'l': 0, 'r':0, 'b': 0, 'i': 0, 'h': 0 }                # Counter for hard calls
     soft_calls = { 'f': [], 'l': [], 'r':[], 'b': [], 'i': [], 'h': [] }    # Will hold soft calls
@@ -135,6 +123,8 @@ for cscore in cscores:
             event_name = event[0]
             contexts = event[1]
             labels = event[2]
+            ems = event[3]
+            means = event[4]
             barcode = event_name.split('-')[0]
             # Counter for keeping track of number of events
             counter += 1
