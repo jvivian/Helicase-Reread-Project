@@ -617,9 +617,11 @@ def chunk_score( indices, contexts, labels, ems ):
         ## Combine P_scores into a single score
         pscore = [ p_dict[x] for x in p_dict ] 
         #pscore = [ a*b for a,b in izip(pscore, weights) ]
-        pscore = np.product(pscore)
-        
-        context_final.append( (round(pscore,4), c) )
+        #pscore = np.sum(pscore)
+        #pscore = np.product(pscore)
+        alpha=1.5
+        pscore = np.mean([ i**alpha for i in pscore ])
+        context_final.append( (pscore, c) )
     
     ## Obtain Prior for each Label ##
     p_dict = OrderedDict()
@@ -634,7 +636,9 @@ def chunk_score( indices, contexts, labels, ems ):
         ## Combine P_scores into a single score
         pscore = [p_dict[x] for x in p_dict]
         #pscore = [a*b for a,b in izip(pscore, weights) ]
-        pscore = np.product(pscore)
+        #pscore = np.sum(pscore)
+        #pscore = np.product(pscore)
+        pscore = np.mean([i**alpha for i in pscore])
         
         #if pscore > 0.9:
         label_final.append( (round(pscore,4), l) )
