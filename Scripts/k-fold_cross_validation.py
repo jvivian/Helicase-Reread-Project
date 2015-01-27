@@ -36,7 +36,7 @@ else:
 
 ## 1. Randomize 230 events into 5 groups of 46 events
 # Find JSON Events 
-source = '../Data/JSON/Train/'
+source = '../Data/JSON/FINAL_Train/'
 for root, dirnames, filenames in os.walk(source):
     events = filenames
     
