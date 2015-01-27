@@ -32,9 +32,7 @@ for event in EVENTS:
             
             CHECK if correct
             STORE TUPLE of x/y (i, {0/1}) in MULTI_READ_PARTITION
-            
-
-            
+                
 
 # Merge functions ???
             
@@ -51,7 +49,7 @@ import sys, ast
 import numpy as np
 import Methods
 import matplotlib.pyplot as plt
-#import seaborn as sns
+import seaborn as sns
 
 def return_hardcall(C,L,cutoff,barcode):
 
@@ -65,13 +63,8 @@ def return_hardcall(C,L,cutoff,barcode):
 
 
 # Retrieve Events
-#with open('..\Data\Ranked_Events\Events.txt', 'r') as f:
-#    Events = f.readlines()
-
-# MAC Fix
-with open('/Users/cbseuser/Desktop/Github/Helicase-Reread-Project/Data/Ranked_Events/Events.txt', 'r') as f:
+with open('..\Data\Ranked_Events\Events.txt', 'r') as f:
     Events = f.readlines()
-
 
 SR_Master = [] # Will hold 1000 averaged points for single reads
 MR_Master = [] # Will hold 1000 averaged points for multi reads 
@@ -79,7 +72,7 @@ MR_Master = [] # Will hold 1000 averaged points for multi reads
 for cutoff in xrange(999,-1,-1):
     cutoff *= .001
 
-    sys.stdout.write("Counter: {}\r".format( i ))
+    sys.stdout.write("Counter: {}\r".format( cutoff ))
     sys.stdout.flush()
 
     sr_average = [] # Vectors that will hold values at this cutoff
@@ -120,12 +113,16 @@ for cutoff in xrange(999,-1,-1):
 
 X = [i*.001 for i in range(999,-1,-1) ]
 
-plt.plot(X, SR_Master, label='Single Reads' )
-plt.plot(X, MR_Master, label='Multiple Reads')
+plt.plot(X, SR_Master, label='Single Reads', lw=2 )
+plt.plot(X, MR_Master, label='Multiple Reads', lw=2)
 
 ax = plt.gca()
 ax.invert_xaxis() 
+ax.set_ylim([0.5,1])
 
-plt.legend()
+plt.title('Density of Single vs. Multiple Reads', fontsize=20)
+plt.xlabel('Chunk Cutoff', fontsize=14)
+plt.ylabel('Accuracy', fontsize=14)
+plt.legend(fontsize='large')
 plt.show()
 
