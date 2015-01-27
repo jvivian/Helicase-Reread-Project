@@ -3,7 +3,7 @@
 #1-25-15
 
 '''
-Plot for # of events 
+Plot Chunk Cutoff by # of Events 
 '''
 import sys, ast
 import numpy as np
@@ -30,7 +30,7 @@ for i in xrange(999,-1,-1):
         C = event.split('@')[1]
         C = ast.literal_eval(C)
         
-        C = [x for x in C if x[0] > i]
+        C = [x for x in C if x[0] >= i]
         
         
         if len(C) == 1:
