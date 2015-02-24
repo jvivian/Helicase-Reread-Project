@@ -17,7 +17,7 @@ else:
 
 ## 1. Randomize 230 events into 5 groups of 46 events
 # Find JSON Events 
-source = '../Data/JSON/FINAL_Train/'
+source = '../Data/JSON/FINAL_Test/'
 for root, dirnames, filenames in os.walk(source):
     events = filenames
     
@@ -32,7 +32,7 @@ event_groups = [ events[i::5] for i in xrange(5) ]
 data = np.zeros( (1, 12) ) 
 
 ## 3. Read in Untrained HMM then train
-with open ( '../Data/HMMs/Temp_Test_2.txt', 'r' ) as file:
+with open ( '../Data/HMMs/Frozen_HMM.txt', 'r' ) as file:
     model = Model.read( file ) 
 #print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
 #model.train( sequences )
@@ -266,9 +266,9 @@ def accuracy_by_filter_score( data, title, sc=False ):
             #sample_sizes.append( trial_name.split('_')[3] )
 
     x = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
-    plt.plot( x, first, label='first', ls='--', c='k')
-    plt.plot( x, last, label='last', ls='--', c='c') 
-    plt.plot( x, random, label='random', ls='--', c='m' )
+    #plt.plot( x, first, label='first', ls='--', c='k')
+    #plt.plot( x, last, label='last', ls='--', c='c') 
+    #plt.plot( x, random, label='random', ls='--', c='m' )
     
     plt.plot( x, hmm, label='hmm', c='y' )
     plt.plot( x, best, label='best', lw=2, c='r' )
@@ -280,7 +280,7 @@ def accuracy_by_filter_score( data, title, sc=False ):
     plt.title( title, fontsize=20 )
     plt.xlabel( 'Chunk Score Cutoff', fontsize=20 )
     plt.ylabel( 'Accuracy', fontsize=20 )
-    plt.ylim( [0.5,1.0] )
+    plt.ylim( [0.5,0.8] )
     plt.legend(loc='lower left', fontsize=14)
     plt.gca().invert_xaxis()
     plt.show()
