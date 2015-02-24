@@ -615,7 +615,7 @@ def chunk_score( indices, contexts, labels, ems ):
         
         ## Combine P_scores into a single score
         pscore = [ p_dict[x] for x in p_dict ] 
-        alpha=1
+        alpha=1.5
         pscore = np.mean([ i**alpha for i in pscore ])
         context_final.append( (pscore, c) )
     
