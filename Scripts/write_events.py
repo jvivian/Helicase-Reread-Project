@@ -3,7 +3,7 @@
 # 1-25-15
 
 '''
-Output events to file
+Output events to file for easy plots/analysis
 '''
 
 import sys, os, random, argparse
