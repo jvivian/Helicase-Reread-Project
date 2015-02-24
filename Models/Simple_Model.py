@@ -2,27 +2,16 @@
 # John Vivian
 
 '''
-Simple_Model.py is a collection of functions that perform the following operations:
-    
-    1.  Builds a profile from an external data file
-    2.  Builds a Hidden Markov Model (HMM) from the profile data
-    3.  Parses an .ABF file (nanopore data) in order to iterate through discrete events
-    4.  Events are passed through the HMM to return a comprehensive Viterbi path.
-    5.  Additional information culled from the Forward-Backward algorithm is also displayed
-    6.  Plots the segmented event, the event as colored by HMM-board, and the emission probabilities 
-        for the fork and label region
-        
-        
-    For Simple Model:
-        Context = States 7-11 [ C*GGT - ATCC ]
-        Label = States 17-21  [ LTCA - CATL ]
-
+This is a repository that contains the Hidden Markov Model used to model
+the Helicase Reread System and other functions associated with analyzing
+the results of passing observations through the model.
 '''
 
 from yahmm import *
 import pandas as pd
 from PyPore.DataTypes import *
 from collections import OrderedDict
+
 
 ## Model, profile, abf parsing, and event analysis
 def Hel308_model( distributions, name, fourmers, low=0, high=90 ):
@@ -691,40 +680,4 @@ def chunk_vector( indices, contexts, labels, ems ):
     
     return context_final, label_final
 
-## Not working / Unneeded ?
-def trans_plot( trans_dict ): 
-    '''
-    Creates a plot showing where certain events occur in relation to the states in the model
-    
-    NOT WORKING
-    '''
 
-    plt.subplot( 411 )
-    plt.bar ( back[0], back[1], color='m', alpha=.66 )
-    plt.title ('Backslips')
-    plt.xlabel ( 'Position' )
-    plt.ylabel ( 'Expected Number' )
-
-    plt.subplot( 412 )
-    plt.bar ( dis[0], dis[1], color='r', alpha=.66)
-    plt.title ( 'Dissociations' )
-    plt.xlabel ( 'Position' )
-    plt.ylabel ( 'Expected Number' )
-    plt.xlim( [0,30] )
-
-    plt.subplot( 413 )
-    plt.bar ( ins[0], ins[1], color='c', alpha=.66)
-    plt.title ( 'Inserts' )
-    plt.xlabel ( 'Position' )
-    plt.ylabel ( 'Expected Number' )
-
-    plt.subplot( 414 )
-    plt.bar ( delete[0], delete[1], color='g', alpha=.66)
-    plt.title ( 'Deletes' )
-    plt.xlabel ( 'Position' )
-    plt.ylabel ( 'Expected Number' )
-
-    plt.suptitle('Number of Rereads: {}'.format( round(rereads,1) ), fontsize=14, fontweight='bold')
-    plt.tight_layout()
-    plt.show()
- 
