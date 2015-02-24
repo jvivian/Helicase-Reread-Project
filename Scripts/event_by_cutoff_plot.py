@@ -46,7 +46,21 @@ for i in xrange(999,-1,-1):
     for group in bins:
         bins[group].append( counter[group] )
         
-
+def rolling_average(X):
+    'computes rolling average on a list'
+    new_X = []
+    window = 15
+    start = -window/2
+    end = window/2
+    for i in xrange(len(X)):
+        if start < 0:
+            new_X.append( np.mean( [x for x in X[0:end] if x!=0 ] ) )
+            start, end = start+1, end+1
+        else:
+            new_X.append( np.mean( [x for x in X[start:end] if x!=0] ) )
+            start, end = start+1, end+1  
+    
+    return new_X
         
 ################
 #   Plotting   #
@@ -55,7 +69,7 @@ for i in xrange(999,-1,-1):
 X = [i*.001 for i in range(999,-1,-1) ]
 
 for i in xrange(4,0,-1):
-    plt.stackplot(X, np.array(bins['leq'+str(i)]))  
+    plt.stackplot(X, np.array(rolling_average(bins['leq'+str(i)])))  
     
 ax = plt.gca()
 ax.invert_xaxis() 
