@@ -32,7 +32,7 @@ event_groups = [ events[i::5] for i in xrange(5) ]
 data = np.zeros( (1, 12) ) 
 
 ## 3. Read in Untrained HMM then train
-with open ( '../Data/HMMs/Temp_Test.txt', 'r' ) as file:
+with open ( '../Data/HMMs/Temp_Test_2.txt', 'r' ) as file:
     model = Model.read( file ) 
 #print '\nTraining HMM: Witholding group {}. Training size {}. Cscore: {}'.format( i+1, len(training), cscore )
 #model.train( sequences )

@@ -32,7 +32,7 @@ for i in event_groups:
 '''
 
 ## Call in Frozen Set of JSONs to train on
-source = '../Data/JSON/hmC_Train/'
+source = '../Data/JSON/C_train/'
 for root, dirnames, filenames in os.walk(source):
     events = filenames
 
@@ -93,7 +93,7 @@ for event_name in events:
 
 		print event_name, icall[1]
 	'''
-	hmC_tset.append( means )
+	C_tset.append( means )
 
 '''
 print 'Creating UBER MODEL (forks)'
@@ -111,24 +111,25 @@ mC_model = Hel308_model( mC_profile, 'mC-31', fourmers)
 
 print '-=Creating hmC HMM=-'
 hmC_model = Hel308_model( hmC_profile, 'hmC-31', fourmers )
-'''
+
 print '\nTraining Cytosine HMM'
 with open( '../Data/HMMs/C-untrained.txt', 'w' ) as file:
     C_model.write( file )
 C_model.train( C_tset )
 with open( '../Data/HMMs/C-trained.txt', 'w' ) as file:
     C_model.write( file )
-
+'''
 print 'Training mC HMM'
 with open( '../Data/HMMs/mC-untrained.txt', 'w' ) as file:
     mC_model.write( file )
 mC_model.train( mC_tset )
 with open( '../Data/HMMs/mC-trained.txt', 'w' ) as file:
     mC_model.write( file )
-'''
+
 print 'Training hmC HMM'
 with open( '../Data/HMMs/hmC-untrained.txt', 'w' ) as file:
     hmC_model.write( file )
 hmC_model.train( hmC_tset )
 with open( '../Data/HMMs/hmC-trained.txt', 'w' ) as file:
     hmC_model.write( file )
+'''

@@ -14,12 +14,12 @@ sys.path.append( '../Models' )
 from Simple_Model import *
 
 # Find JSON Events 
-source = '../Data/JSON/FINAL_Train/'
+source = '../Data/JSON/FINAL_Test/'
 for root, dirnames, filenames in os.walk(source):
     events = filenames
     
 # Read in model    
-with open ( '../Data/HMMs/Temp_Test.txt', 'r' ) as file:
+with open ( '../Data/HMMs/Frozen_HMM.txt', 'r' ) as file:
     model = Model.read( file ) 
     
 # Acquire indices
@@ -57,7 +57,7 @@ for event_name in events:
         max_l = max( [ x[0] for x in labels ] )
         
         for i in xrange(9,-1,-1):
-            if max_c >= i*.10 and max_l >= i*.10:
+            if max_c >= i*.10:# and max_l >= i*.10:
 
                 C = [ x for x in contexts if x[0] >= i*.10 ]
                 L = [ x for x in labels if x[0] >= i*.10 ]

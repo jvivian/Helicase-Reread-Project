@@ -608,7 +608,6 @@ def chunk_score( indices, contexts, labels, ems ):
     p_dict = OrderedDict()
     pscore = []
     context_final = []
-    #weights = [ 1.0/9, 2.0/9, 1.0/3, 2.0/9, 1.0/9 ]
     for c in contexts:
         temp_ems = ems[ c, : ]                   # Slice matrix based on observations
         for i in xrange(7,12):
@@ -616,10 +615,7 @@ def chunk_score( indices, contexts, labels, ems ):
         
         ## Combine P_scores into a single score
         pscore = [ p_dict[x] for x in p_dict ] 
-        #pscore = [ a*b for a,b in izip(pscore, weights) ]
-        #pscore = np.sum(pscore)
-        #pscore = np.product(pscore)
-        alpha=1.5
+        alpha=1
         pscore = np.mean([ i**alpha for i in pscore ])
         context_final.append( (pscore, c) )
     
@@ -627,7 +623,6 @@ def chunk_score( indices, contexts, labels, ems ):
     p_dict = OrderedDict()
     pscore = []
     label_final = []
-    #weights = [1.0/11, 2.0/11, 3.0/11, 3.0/11, 2.0/11]
     for l in labels:
         temp_ems = ems[ l, : ]
         for i in xrange( 17, 22):
@@ -635,9 +630,6 @@ def chunk_score( indices, contexts, labels, ems ):
         
         ## Combine P_scores into a single score
         pscore = [p_dict[x] for x in p_dict]
-        #pscore = [a*b for a,b in izip(pscore, weights) ]
-        #pscore = np.sum(pscore)
-        #pscore = np.product(pscore)
         pscore = np.mean([i**alpha for i in pscore])
         
         #if pscore > 0.9:
