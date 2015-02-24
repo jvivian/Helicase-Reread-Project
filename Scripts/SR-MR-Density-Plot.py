@@ -3,47 +3,8 @@
 # 1-25-15
 
 '''
-# Define each event as a function x = chunk cutoff [.999, 0]. 
-#
-#  Event  = [.99, .90, .44 ]
-#
-#
-#  sr = [ (.99, 1), (.98, 1 ) ... (.91, 1) ]   # If Correct 
-#  mr = [ (.90, 0), (.89, 0), ... (.44, 1) ... ] # If first addition incorrect, section correct
-
-Pseudo-code
-
-SR_FUNCTIONS = [] # Will store our our list of functions
-MR_FUNCTIONS = [] # Will store the multi list of functions
-
-for event in EVENTS:
-   
-   SINGLE_READ_PARTITION = []
-   MULTI_READ_PARTITION = []
-   
-    for i in xrange(999,-1,-1):
-        i *= .001
-        
-        C = [x for x in CONTEXT if x[0] >= i]
-        
-        if len(C) == 1:
-            
-            CHECK if correct
-            STORE tuple of x/y (i, {0/1}) in SINGLE_READ_PARTITION
-            
-        if len(C) > 1:
-            
-            CHECK if correct
-            STORE TUPLE of x/y (i, {0/1}) in MULTI_READ_PARTITION
-                
-
-# Merge functions ???
-            
-# Dynamically plot all that shit. 
-
-... Alternatively
-
-For each POINT average the correct number of SR and MR....  Exception statement for 0s. 
+At every point between [0,1] (0.001 interval), the accuracies for multi and single reads
+are averaged. The plots are then smoothed with a rolling average.
 '''
 
 
@@ -125,7 +86,7 @@ for cutoff in xrange(999,-1,-1):
 
 
 def rolling_average(X):
-    'computes rolling average on a list'
+    '''takes in list and returns list after performing rolling average '''
     new_X = []
     std = []
     window = 15
