@@ -15,8 +15,8 @@ A subsection of 3 current traces in the context region highlight how the differe
 A:  A current trace of a single event with three distinct reads. The coloring scheme is a 4-color cycle that indicates how the segmenter divided up the current trace. The high amplitude states (80pA) are the result of abasic residues passing through the pore.  B:  The same trace as A, but colored by HMM state (black segments represent insert states [noise/off-pathway segments]). This figure helps give a visual representation to how a set of observations are aligned to the HMM.
 
 <section>
-    <img width="400" src="http://i.imgur.com/B6mGlXb.png">
-    <img width="400" src="http://i.imgur.com/19gEnXj.png">
+    <img width="300" src="http://i.imgur.com/B6mGlXb.png">
+    <img width="300" src="http://i.imgur.com/19gEnXj.png">
 </section>
 [Left] A modular `board' in the HMM representative of a specific current mean (segment) in a nanopore trace. Circular nodes represent silent states (non-emitting states), **D** is the delete state (missing segment), **I** is the insert state (off-pathway segment/noise spikes), **M** is the match state (aligning to a segment of the same mean), and the red states represent the backslip pathway. [Right] A graph showing the probability of a backslip at differing lengths given transition probabilities.
 
