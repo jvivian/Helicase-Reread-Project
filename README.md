@@ -18,6 +18,7 @@ A:  A current trace of a single event with three distinct reads. The coloring sc
     <img width="300" src="http://i.imgur.com/B6mGlXb.png">
     <img width="300" src="http://i.imgur.com/19gEnXj.png">
 </section>
+
 [Left] A modular `board' in the HMM representative of a specific current mean (segment) in a nanopore trace. Circular nodes represent silent states (non-emitting states), **D** is the delete state (missing segment), **I** is the insert state (off-pathway segment/noise spikes), **M** is the match state (aligning to a segment of the same mean), and the red states represent the backslip pathway. [Right] A graph showing the probability of a backslip at differing lengths given transition probabilities.
 
 ![meta](http://i.imgur.com/I7gRV6H.png)
