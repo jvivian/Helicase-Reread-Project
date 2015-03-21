@@ -3,7 +3,7 @@
 # 1-25-15
 
 '''
-Output events to file for easy plots/analysis
+Ranks events
 '''
 
 import sys, os, random, argparse
@@ -62,7 +62,7 @@ for event_name in events:
                 C = [ x for x in contexts if x[0] >= i*.10 ]
                 L = [ x for x in labels if x[0] >= i*.10 ]
                 
-                sys.stdout.write( 'C:{}\t\tAssigned:{}\tPercentage:{}%\r'.format(round(max_c,2), i, round((counter*1.0/len(events))*100,2)))
+                sys.stdout.write( 'C:{}\t\tPercentage:{}%\r'.format(round(max_c,2), round((counter*1.0/len(events))*100,2)))
                 sys.stdout.flush()
                 
                 if len(C) > 1:
