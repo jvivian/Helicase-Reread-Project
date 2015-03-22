@@ -161,6 +161,6 @@ plt.ylabel('Accuracy', fontsize=14)
 plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
           ncol=2, fancybox=True, shadow=True)
 
-sys.stdout.write("\nSaving plot to mounted data folder")
+sys.stdout.write("\nSaving plot to mounted data folde\n\nr")
 plt.savefig('/data/accuracies.png', dpi=300)
 #plt.savefig('/Users/Jvivian/Desktop/accuracies.png', dpi=300)

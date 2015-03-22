@@ -26,7 +26,7 @@ bins = { 'leq1': [], 'leq2': [], 'leq3': [], 'leq4': [] }
 sys.stdout.write("\n\nCounting Number of Events by Cutoff\n\n")
 for i in xrange(999,-1,-1):
     i *= .001
-    sys.stdout.write('Chunk Cutoff: {}\r'.format( i ))
+    sys.stdout.write('Percentage: {}%\r'.format( round( (1 - i)*100 , 2) ))
     sys.stdout.flush()
     counter = { 'leq1': 0, 'leq2': 0, 'leq3': 0, 'leq4': 0 }
     for event in Events:
