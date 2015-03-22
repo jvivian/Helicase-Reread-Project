@@ -7,14 +7,13 @@ Plot Chunk Cutoff by # of Events
 '''
 import sys, ast
 import numpy as np
-import Methods
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 
 # Retrieve Events
-with open('..\Data\Ranked_Events\Events.txt', 'r') as f:
+with open('../Data/Ranked_Events/Events.txt', 'r') as f:
     Events = f.readlines()
     
 # Bins -- from .999 to 0
@@ -72,20 +71,20 @@ for i in xrange(4,0,-1):
     plt.stackplot(X, np.array(rolling_average(bins['leq'+str(i)])))  
     
 ax = plt.gca()
+plt.xticks(np.arange(min(X), max(X), 0.1) )
 ax.invert_xaxis() 
 
 blue = mpatches.Patch(color='blue', label='1-4+ Chunks' )
 green = mpatches.Patch(color='green', label='1-3 Chunks')
 red = mpatches.Patch(color='red', label='1-2 Chunks')
 purple = mpatches.Patch(color='purple', label='1 Chunk')
-plt.legend(handles = [blue, green, red, purple], loc=3, fontsize='large')   
+plt.legend(handles = [blue, green, red, purple], loc=8, fontsize='large')
 
 plt.xlabel("Chunk Cutoff", fontsize=14)
 plt.ylabel("Number of Events", fontsize=14)
 plt.title("Number of Events by Chunk Cutoff", fontsize=20)
 
 plt.show()
-
 
 
 
