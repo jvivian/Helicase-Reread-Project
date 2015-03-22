@@ -136,23 +136,25 @@ MR_mean = np.mean([i for i in MR_Master_Best if i > 0])
 SR_mean_plot = [SR_mean for i in xrange(1000)]
 MR_mean_plot = [MR_mean for i in xrange(1000)]
 
-plt.plot(X, SR_mean_plot, label="SR Average", lw=2, ls='--')
-plt.plot(X, MR_mean_plot, label='MR Average', lw=2, ls='--')
+plt.plot(X, SR_mean_plot, label="SR Average", lw=1, ls='--')
+plt.plot(X, MR_mean_plot, label='MR Average', lw=1, ls='--')
 
-plt.plot(X, SR_Master, label='Single Reads', lw=2 )
-plt.plot(X, MR_Master_Ind, label='Independent Consensus', lw=2)
-plt.plot(X, MR_Master_Best, label='Best Consensus', lw=2)
+plt.plot(X, SR_Master, label='Single Reads', lw=1 )
+#plt.plot(X, MR_Master_Ind, label='Independent Consensus', lw=2)
+plt.plot(X, MR_Master_Best, label='Best Consensus', lw=1)
+
 ax = plt.gca()
 plt.xticks(np.arange(min(X), max(X), 0.1) )
-ax.set_xlim([0.75, 0.95])
+ax.set_xlim([0.0, 0.95])
 ax.invert_xaxis() 
 ax.set_ylim([0.6,0.85])
 #ax.fill_between(X, SR_plus, SR_minus, alpha=0.5 )
 #ax.fill_between(X, MR_plus, MR_minus, alpha=0.5)
 
-plt.title('Accuracies of Single vs. Multiple Reads', fontsize=20)
+plt.title('Accuracies of Single vs. Multiple Reads', fontsize=18)
 plt.xlabel('Chunk Cutoff', fontsize=14)
 plt.ylabel('Accuracy', fontsize=14)
-plt.legend(fontsize='large', loc=3)
+plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
+          ncol=2, fancybox=True, shadow=True)
 plt.show()
-
+#plt.savefig('/Users/Jvivian/Desktop/Accuracy_MR_SR.png', dpi=300)

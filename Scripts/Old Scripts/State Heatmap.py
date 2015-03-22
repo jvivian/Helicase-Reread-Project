@@ -34,7 +34,12 @@ for item in total:
     
 ## Assemble Final DataFrame
 df = pd.DataFrame( [ C_mC[:18], mC_hmC[:18], C_hmC[:18], total_diff[:18] ] )   # Context
-#df = pd.DataFrame( [ C_mC[10:], mC_hmC[10:], C_hmC[10:], total_diff[10:] ] )    # Label
+
+# Test Plot
+df = [[ 0.88235294,  0.,          0.11764706]
+ [ 0.66666667,  0.33333333,  0.        ]
+ [ 0.23076923,  0.,          0.76923077]]
+
 
 ## Plotting
 # setup
@@ -57,6 +62,8 @@ ax.set_yticklabels(row_labels, minor=False)
 plt.gca().set_xlim(0, 18)      # Context
 #plt.gca().set_xlim(0, 22)       # Label
 plt.title( 'State Importance' )
+
+
 
 cb = plt.colorbar()
 cb.set_label('Absolute Mean Difference', labelpad=20, fontsize='16')

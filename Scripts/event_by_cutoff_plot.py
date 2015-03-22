@@ -78,14 +78,16 @@ blue = mpatches.Patch(color='blue', label='1-4+ Chunks' )
 green = mpatches.Patch(color='green', label='1-3 Chunks')
 red = mpatches.Patch(color='red', label='1-2 Chunks')
 purple = mpatches.Patch(color='purple', label='1 Chunk')
-plt.legend(handles = [blue, green, red, purple], loc=8, fontsize='large')
+#plt.legend(handles = [blue, green, red, purple], loc=3, fontsize=12)
+plt.legend(handles = [blue, green, red, purple], loc=8, bbox_to_anchor=(0.5, 0.0),
+          ncol=2, fancybox=True, shadow=True)
 
 plt.xlabel("Chunk Cutoff", fontsize=14)
 plt.ylabel("Number of Events", fontsize=14)
-plt.title("Number of Events by Chunk Cutoff", fontsize=20)
+plt.title("Number of Events by Chunk Cutoff", fontsize=18)
 
 plt.show()
-
+#plt.savefig('/Users/Jvivian/Desktop/events.png', dpi=300)
 
 
     
