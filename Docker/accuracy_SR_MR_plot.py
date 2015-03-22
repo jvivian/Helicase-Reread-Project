@@ -65,7 +65,7 @@ MR_Master_Best = []
 sys.stdout.write("\n\nAveraging Read Accuracy by Cutoff\n\n")
 for cutoff in xrange(999,-1,-1):
     cutoff *= .001
-    sys.stdout.write("Percentage: {}%\r".format( round( (1 - cutoff)*100 , 2) ))
+    sys.stdout.write("Progress: {}%\r".format( round( (1 - cutoff)*100 , 2) ))
     sys.stdout.flush()
 
     sr_average = [] # Vectors that will hold values at this cutoff
@@ -161,6 +161,6 @@ plt.ylabel('Accuracy', fontsize=14)
 plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
           ncol=2, fancybox=True, shadow=True)
 
-sys.stdout.write("\nSaving plot to mounted data folde\n\nr")
+sys.stdout.write("\nSaving plot to mounted data folder\n\n")
 plt.savefig('/data/accuracies.png', dpi=300)
 #plt.savefig('/Users/Jvivian/Desktop/accuracies.png', dpi=300)
