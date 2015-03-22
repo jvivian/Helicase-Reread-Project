@@ -4,7 +4,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-df = pd.DataFrame( [[ 0.88,  0., 0.12],[ 0.67,  0.33,  0.],[ 0.23,  0., 0.77]] )
+df = pd.DataFrame(
+    [[ 0.76,  0.04,  0.20],
+ [ 0.32,      0.48,        0.20],
+ [ 0.21,  0.05,  0.74]] )
 
 
 ## Plotting
@@ -37,8 +40,8 @@ for y in range(df.shape[0]):
 
 cb = plt.colorbar()
 
-plt.show()
-#plt.savefig('/Users/Jvivian/Desktop/CM.png', dpi=300)
+#plt.show()
+plt.savefig('/Users/Jvivian/Desktop/CM.png', dpi=300)
 
 
 
