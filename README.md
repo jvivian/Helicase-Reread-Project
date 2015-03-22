@@ -4,7 +4,7 @@ Helicase-Reread-Project
 Hypothesis being tested:  Will additional "reads" provided by a nanopore reread system reduce the error rate of calling epigenetic modifications?
 
 ## Reproduce Results
-These steps were tested in a Linux/OSx environment using Docker: https://docs.docker.com/installation/
+These steps were tested in both a Linux/OSx and Windows environment using Docker: https://docs.docker.com/installation/
     
     docker pull jvivian/reread
     docker run -v [output path]:/data jvivian/reread python events_by_cutoff_plot.py
@@ -13,6 +13,10 @@ These steps were tested in a Linux/OSx environment using Docker: https://docs.do
 [output path] must be an absolute host path, i.e.:  
 
     docker run -v /Users/Jvivian/Desktop:/data jvivian/reread python events_by_cutoff_plot.py
+
+If using Windows, the absolute path must be given as:
+
+    docker run -v /c/Users/Thyrus/Desktop:/data jvivian/reread python events_by_cutoff_plot.py
 
 ## Figures
 ![break-away](http://i.imgur.com/fj6GpEt.png)
