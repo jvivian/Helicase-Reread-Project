@@ -26,7 +26,7 @@ bins = { 'leq1': [], 'leq2': [], 'leq3': [], 'leq4': [] }
 sys.stdout.write("\n\nCounting Number of Events by Cutoff\n\n")
 for i in xrange(999,-1,-1):
     i *= .001
-    sys.stdout.write('Percentage: {}%\r'.format( round( (1 - i)*100 , 2) ))
+    sys.stdout.write('Progress: {}%\r'.format( round( (1 - i)*100 , 2) ))
     sys.stdout.flush()
     counter = { 'leq1': 0, 'leq2': 0, 'leq3': 0, 'leq4': 0 }
     for event in Events:
@@ -83,14 +83,20 @@ green = mpatches.Patch(color='green', label='1-3 Chunks')
 red = mpatches.Patch(color='red', label='1-2 Chunks')
 purple = mpatches.Patch(color='purple', label='1 Chunk')
 #plt.legend(handles = [blue, green, red, purple], loc=3, fontsize=12)
-plt.legend(handles = [blue, green, red, purple], loc=8, bbox_to_anchor=(0.5, 0.0),
+
+plt.plot([], [], color='blue', label='4+ Chunks')
+plt.plot([], [], color='green', label='3 Chunks')
+plt.plot([], [], color='red', label='2 Chunks')
+plt.plot([], [], color='purple', label='1 Chunk')
+
+plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
           ncol=2, fancybox=True, shadow=True)
 
 plt.xlabel("Chunk Cutoff", fontsize=14)
 plt.ylabel("Number of Events", fontsize=14)
 plt.title("Number of Events by Chunk Cutoff", fontsize=18)
 
-sys.stdout.write("\nSaving plot to mounted data folder")
+sys.stdout.write("\nSaving plot to mounted data folder\n\n")
 plt.savefig('/data/events_by_cutoff.png', dpi=300)
 #plt.savefig('/Users/Jvivian/Desktop/ebc.png', dpi=300)
 
