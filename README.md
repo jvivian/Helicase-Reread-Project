@@ -13,7 +13,8 @@ These steps were tested in a Linux/OSx environment using Docker: https://docs.do
 [output path] must be an absolute host path, i.e.:  
 
     docker run -v /Users/Jvivian/Desktop:/data jvivian/reread python events_by_cutoff_plot.py
-    
+
+## Figures
 ![break-away](http://i.imgur.com/fj6GpEt.png)
 A: Substrate bound to the lipid bilayer via a cholesterol tag with a helicase (Hel308) bound and inactive at the other end.  B: Electric potential causes the DNA duplex to unwind, leaving behind the cholesterol tether bound to the complement strand. C: Electric potential and the steady-state nature of the G-Quadruplex (GQ) causes it to unfold  allowing the helicase to become enzymatically active in the 3' -> 5' direction. D:  As Hel308 translocates the DNA back up through the pore, the GQ will refold allowing an additional enzyme to become bound. E: Continued translocation. F: More than 3-4 abasic residues causes Hel308 to dissociate from the substrate (9 are used in the substrate). The DNA strand is then pulled back down and the cycle is able to repeat itself once more.
 
