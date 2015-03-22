@@ -15,8 +15,6 @@ import matplotlib.patches as mpatches
 import seaborn as sns
 
 
-
-
 # Retrieve Events
 with open('../Data/Ranked_Events/Events.txt', 'r') as f:
     Events = f.readlines()
@@ -25,6 +23,7 @@ with open('../Data/Ranked_Events/Events.txt', 'r') as f:
 bins = { 'leq1': [], 'leq2': [], 'leq3': [], 'leq4': [] }
 
 ## For a range of chunk cutoff, what are the number of different reads.
+sys.stdout.write("\n\nCounting Number of Events by Cutoff\n\n")
 for i in xrange(999,-1,-1):
     i *= .001
     sys.stdout.write('Chunk Cutoff: {}\r'.format( i ))
@@ -83,14 +82,17 @@ blue = mpatches.Patch(color='blue', label='1-4+ Chunks' )
 green = mpatches.Patch(color='green', label='1-3 Chunks')
 red = mpatches.Patch(color='red', label='1-2 Chunks')
 purple = mpatches.Patch(color='purple', label='1 Chunk')
-plt.legend(handles = [blue, green, red, purple], loc=8, fontsize='large')
+#plt.legend(handles = [blue, green, red, purple], loc=3, fontsize=12)
+plt.legend(handles = [blue, green, red, purple], loc=8, bbox_to_anchor=(0.5, 0.0),
+          ncol=2, fancybox=True, shadow=True)
 
 plt.xlabel("Chunk Cutoff", fontsize=14)
 plt.ylabel("Number of Events", fontsize=14)
-plt.title("Number of Events by Chunk Cutoff", fontsize=20)
+plt.title("Number of Events by Chunk Cutoff", fontsize=18)
 
 sys.stdout.write("\nSaving plot to mounted data folder")
 plt.savefig('/data/events_by_cutoff.png', dpi=300)
+#plt.savefig('/Users/Jvivian/Desktop/ebc.png', dpi=300)
 
 
     
