@@ -10,7 +10,7 @@ These steps were tested in a Linux/OSx environment using Docker: https://docs.do
     docker run -v [output path]:/data jvivian/reread python events_by_cutoff_plot.py
     docker run -v [output path]:/data jvivian/reread python accuracy_SR_MR_plot.py
 
-[output path] must be absolute host path, i.e.:  
+[output path] must be an absolute host path, i.e.:  
 
     docker run -v /Users/Jvivian/Desktop:/data jvivian/reread python events_by_cutoff_plot.py
     
