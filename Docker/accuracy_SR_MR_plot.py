@@ -156,7 +156,7 @@ ax.set_ylim([0.6,0.85])
 #ax.fill_between(X, MR_plus, MR_minus, alpha=0.5)
 
 plt.title('Accuracies of Single vs. Multiple Reads', fontsize=18)
-plt.xlabel('Chunk Cutoff', fontsize=14)
+plt.xlabel('CScore Cutoff', fontsize=14)
 plt.ylabel('Accuracy', fontsize=14)
 plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
           ncol=2, fancybox=True, shadow=True)

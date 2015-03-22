@@ -92,9 +92,9 @@ plt.plot([], [], color='purple', label='1 Chunk')
 plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
           ncol=2, fancybox=True, shadow=True)
 
-plt.xlabel("Chunk Cutoff", fontsize=14)
+plt.xlabel("CScore Cutoff", fontsize=14)
 plt.ylabel("Number of Events", fontsize=14)
-plt.title("Number of Events by Chunk Cutoff", fontsize=18)
+plt.title("Number of Events by CScore Cutoff", fontsize=18)
 
 sys.stdout.write("\nSaving plot to mounted data folder\n\n")
 plt.savefig('/data/events_by_cutoff.png', dpi=300)
