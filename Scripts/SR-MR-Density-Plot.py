@@ -12,6 +12,7 @@ import sys, ast
 import numpy as np
 import Methods
 import matplotlib.pyplot as plt
+from scipy import stats
 import seaborn as sns
 
 def return_hardcall(C,L,cutoff,barcode,Ind=False):
@@ -32,7 +33,7 @@ def return_hardcall(C,L,cutoff,barcode,Ind=False):
 
 
 # Retrieve Events
-with open('..\Data\Ranked_Events\Events.txt', 'r') as f:
+with open('../Data/Ranked_Events/Events.txt', 'r') as f:
     Events = f.readlines()
 
 SR_Master = [] # Will hold 1000 averaged points for single reads
@@ -112,7 +113,10 @@ X = [i*.001 for i in range(999,-1,-1) ]
 
 SR_Master, SR_std = rolling_average(SR_Master)
 MR_Master_Best, MR_std = rolling_average(MR_Master_Best)
-#MR_Master_Ind = rolling_average(MR_Master_Ind)
+MR_Master_Ind, MRI_std = rolling_average(MR_Master_Ind)
+
+ttest = stats.ttest_ind([i for i in SR_Master if i > 0], [i for i in MR_Master_Best if i > 0])
+print ttest
 
 SR_plus = []
 SR_minus = []
@@ -125,20 +129,30 @@ MR_minus = []
 for i in xrange(len(MR_Master_Best)):
     MR_plus.append( MR_Master_Best[i]+MR_std[i] )
     MR_minus.append( MR_Master_Best[i]-MR_std[i] )
-    
+
+SR_mean = np.mean([i for i in SR_Master if i > 0])
+MR_mean = np.mean([i for i in MR_Master_Best if i > 0])
+
+SR_mean_plot = [SR_mean for i in xrange(1000)]
+MR_mean_plot = [MR_mean for i in xrange(1000)]
+
+plt.plot(X, SR_mean_plot, label="SR Average", lw=2, ls='--')
+plt.plot(X, MR_mean_plot, label='MR Average', lw=2, ls='--')
 
 plt.plot(X, SR_Master, label='Single Reads', lw=2 )
-#plt.plot(X, MR_Master_Ind, label='Independent Consensus', lw=2)
+plt.plot(X, MR_Master_Ind, label='Independent Consensus', lw=2)
 plt.plot(X, MR_Master_Best, label='Best Consensus', lw=2)
 ax = plt.gca()
+plt.xticks(np.arange(min(X), max(X), 0.1) )
+ax.set_xlim([0.75, 0.95])
 ax.invert_xaxis() 
 ax.set_ylim([0.6,0.85])
 #ax.fill_between(X, SR_plus, SR_minus, alpha=0.5 )
 #ax.fill_between(X, MR_plus, MR_minus, alpha=0.5)
 
-plt.title('Density of Single vs. Multiple Reads', fontsize=20)
+plt.title('Accuracies of Single vs. Multiple Reads', fontsize=20)
 plt.xlabel('Chunk Cutoff', fontsize=14)
 plt.ylabel('Accuracy', fontsize=14)
-plt.legend(fontsize='large')
+plt.legend(fontsize='large', loc=3)
 plt.show()
 
