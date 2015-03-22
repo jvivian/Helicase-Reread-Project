@@ -73,7 +73,7 @@ for event_name in events:
         max_l = max( [ x[0] for x in labels ] )
         
         for i in xrange(9,-1,-1):
-            if max_c >= i*.10 and max_l >= i*.10:
+            if max_c >= i*.10:# and max_l >= i*.10:
                 C = [ x for x in contexts if x[0] >= i*.10 ]
                 L = [ x for x in labels if x[0] >= i*.10 ]
 
@@ -281,7 +281,7 @@ def accuracy_by_filter_score( data, title, sc=False ):
     plt.title( title, fontsize=18 )
     plt.xlabel( 'Chunk Score Cutoff', fontsize=14 )
     plt.ylabel( 'Accuracy', fontsize=14 )
-    plt.ylim( [0.45,0.8] )
+    plt.ylim( [0.5,0.85] )
     plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
           ncol=3, fancybox=True, shadow=True)
     plt.gca().invert_xaxis()
