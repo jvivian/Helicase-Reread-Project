@@ -1,10 +1,19 @@
 Helicase-Reread-Project
 =======================
 
-Hypothesis being tested:  Will additional `reads' provided by a nanopore reread system reduce the error rate of calling epigenetic modifications?
+Hypothesis being tested:  Will additional "reads" provided by a nanopore reread system reduce the error rate of calling epigenetic modifications?
 
-### Insert steps to produce final plots (encapsulate in a bash script)
+## Reproduce Results
+These steps were tested in a Linux/OSx environment using Docker: https://docs.docker.com/installation/
+    
+    docker pull jvivian/reread
+    docker run -v [output path]:/data jvivian/reread python events_by_cutoff_plot.py
+    docker run -v [output path]:/data jvivian/reread python accuracy_SR_MR_plot.py
 
+[output path] must be absolute host path, i.e.:  
+
+    docker run -v /Users/Jvivian/Desktop:/data jvivian/reread python events_by_cutoff_plot.py
+    
 ![break-away](http://i.imgur.com/fj6GpEt.png)
 A: Substrate bound to the lipid bilayer via a cholesterol tag with a helicase (Hel308) bound and inactive at the other end.  B: Electric potential causes the DNA duplex to unwind, leaving behind the cholesterol tether bound to the complement strand. C: Electric potential and the steady-state nature of the G-Quadruplex (GQ) causes it to unfold  allowing the helicase to become enzymatically active in the 3' -> 5' direction. D:  As Hel308 translocates the DNA back up through the pore, the GQ will refold allowing an additional enzyme to become bound. E: Continued translocation. F: More than 3-4 abasic residues causes Hel308 to dissociate from the substrate (9 are used in the substrate). The DNA strand is then pulled back down and the cycle is able to repeat itself once more.
 
@@ -16,7 +25,7 @@ A:  A current trace of a single event with three distinct reads. The coloring sc
 
 <section>
     <img width="300" src="http://i.imgur.com/B6mGlXb.png">
-    <img width="300" src="http://i.imgur.com/19gEnXj.png">
+    <img width="300" src="http://i.imgur.com/XOQvAHE.png">
 </section>
 
 [Left] A modular `board' in the HMM representative of a specific current mean (segment) in a nanopore trace. Circular nodes represent silent states (non-emitting states), **D** is the delete state (missing segment), **I** is the insert state (off-pathway segment/noise spikes), **M** is the match state (aligning to a segment of the same mean), and the red states represent the backslip pathway. [Right] A graph showing the probability of a backslip at differing lengths given transition probabilities.
@@ -29,3 +38,12 @@ The posterior probability matrix, or emissions (ems) matrix, contains a set of a
 
 ![chunk](http://i.imgur.com/21tzckB.png)
 Each 'slice' of the fork is used to guarantee that the chunk is representative of the complete context region.  Taking the maximum probability of each slice appearing in the chunk produces a vector of 5 values that are then combined into one value known as the 'chunk score'.  These scores are used to rate the level of confidence associated with the chunk.
+
+# Results
+![accuracy](http://i.imgur.com/KydPhUL.png)
+
+![events](http://i.imgur.com/FsSTJYS.png)
+
+![MR](http://i.imgur.com/Hi2ou9d.png)
+
+![CM](http://i.imgur.com/4TEhfTs.png)
