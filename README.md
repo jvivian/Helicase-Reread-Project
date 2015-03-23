@@ -16,7 +16,7 @@ These steps were tested in both a Linux/OSx and Windows environment using Docker
 
 If using Windows, the absolute path must be given as:
 
-    docker run -v /c/Users/Thyrus/Desktop:/data jvivian/reread python events_by_cutoff_plot.py
+    docker run -v /c/Users/Jvivian/Desktop:/data jvivian/reread python events_by_cutoff_plot.py
 
 ## Figures
 ![break-away](http://i.imgur.com/fj6GpEt.png)
