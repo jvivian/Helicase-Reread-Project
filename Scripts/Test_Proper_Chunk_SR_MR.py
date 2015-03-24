@@ -266,14 +266,14 @@ def accuracy_by_filter_score( data, title, sc=False ):
          
             #sample_sizes.append( trial_name.split('_')[3] )
 
-    x = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
-    plt.plot( x, first, label='First', ls='--', c='k', lw=1)
-    plt.plot( x, last, label='Last', ls='--', c='c', lw=1)
-    plt.plot( x, random, label='Random', ls='--', c='m', lw=1 )
+    x = cscores
+    #plt.plot( x, first, label='First', ls='--', c='k', lw=1)
+    #plt.plot( x, last, label='Last', ls='--', c='c', lw=1)
+    #plt.plot( x, random, label='Random', ls='--', c='m', lw=1 )
     
-    plt.plot( x, hmm, label='HMM', c='y', lw=1 )
-    plt.plot( x, best, label='Best', lw=1, c='r' )
-    plt.plot( x, ind, label='Ind', lw=1, c='b')
+    plt.plot( x, hmm, label='HMM')#, c='y', lw=1 )
+    plt.plot( x, best, label='Best')#, lw=1, c='r' )
+    plt.plot( x, ind, label='Ind')#, lw=1, c='b')
     
    # plt.title( trial_name.split('_')[0] + ' - ' + trial_name.split('_')[1] \
     #            + ' - ' + trial_name.split('_')[2], fontsize=14 )
@@ -283,7 +283,7 @@ def accuracy_by_filter_score( data, title, sc=False ):
     plt.ylabel( 'Accuracy', fontsize=14 )
     plt.ylim( [0.5,0.85] )
     plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
-          ncol=3, fancybox=True, shadow=True)
+          ncol=2, fancybox=True, shadow=True)
     plt.gca().invert_xaxis()
     #plt.show()
     plt.savefig( '/Users/Jvivian/Desktop/MR.png', dpi=300)

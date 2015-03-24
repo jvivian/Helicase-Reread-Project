@@ -19,7 +19,7 @@ def return_hardcall(C,L,cutoff,barcode,Ind=False):
 
     bchunk, bcall = Methods.best_chunk( C, L )
     ichunk, icall = Methods.ind_consensus( C, L, cutoff )
-    
+
     if Ind:
         if barcode == icall:
             return 1
