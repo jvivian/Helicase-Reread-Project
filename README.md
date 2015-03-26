@@ -45,7 +45,7 @@ The posterior probability matrix, or emissions (ems) matrix, contains a set of a
 Each 'slice' of the fork is used to guarantee that the chunk is representative of the complete context region.  Taking the maximum probability of each slice appearing in the chunk produces a vector of 5 values that are then combined into one value known as the 'chunk score'.  These scores are used to rate the level of confidence associated with the chunk.
 
 # Results
-![accuracy_diff](http://i.imgur.com/g7Qkn3u.png)
+![accuracy_diff](http://i.imgur.com/bgMzp9l.png)
 
 ![accuracy](http://i.imgur.com/KydPhUL.png)
 
