@@ -7,7 +7,8 @@ At every point between [0,1] (0.001 interval), the accuracies for multi and sing
 are averaged. The plots are then smoothed with a rolling average.
 '''
 
-
+from matplotlib import use
+use('SVG')
 import sys, ast
 import numpy as np
 import Methods
@@ -15,10 +16,12 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import seaborn as sns
 
-def return_hardcall(C,L,cutoff,barcode,Ind=False):
+
+def return_hardcall(C,L,cutoff,barcode,Ind=False,hmm=False):
 
     bchunk, bcall = Methods.best_chunk( C, L )
     ichunk, icall = Methods.ind_consensus( C, L, cutoff )
+    #hchunk, hcall = Methods.hmm_consensus()
 
     if Ind:
         if barcode == icall:
@@ -30,6 +33,7 @@ def return_hardcall(C,L,cutoff,barcode,Ind=False):
             return 1
         else:
             return 0
+
 
 
 # Retrieve Events
@@ -69,11 +73,11 @@ for cutoff in xrange(999,-1,-1):
             mr_average_Ind.append( return_hardcall(C,L,cutoff,barcode,True) )
             mr_average_Best.append( return_hardcall(C,L,cutoff,barcode) )
 
+
     if sr_average:
         SR_Master.append( np.mean( sr_average) )
     else:
         SR_Master.append(np.nan)
-
 
     if mr_average_Ind:
         MR_Master_Ind.append( np.mean( mr_average_Ind) )
@@ -136,25 +140,42 @@ MR_mean = np.mean([i for i in MR_Master_Best if i > 0])
 SR_mean_plot = [SR_mean for i in xrange(1000)]
 MR_mean_plot = [MR_mean for i in xrange(1000)]
 
-plt.plot(X, SR_mean_plot, label="SR Average", lw=1, ls='--')
-plt.plot(X, MR_mean_plot, label='MR Average', lw=1, ls='--')
-
 plt.plot(X, SR_Master, label='Single Reads', lw=1 )
 #plt.plot(X, MR_Master_Ind, label='Independent Consensus', lw=2)
 plt.plot(X, MR_Master_Best, label='Best Consensus', lw=1)
+plt.plot(X, SR_mean_plot, label="SR Average", lw=1, ls='--')
+plt.plot(X, MR_mean_plot, label='MR Average', lw=1, ls='--')
+
+# Test for differences
+diff = [a-b for a, b in zip(MR_Master_Best,SR_Master)]
+rolled_diff, rdstd = rolling_average(diff)
+
+#plt.plot(X, rolled_diff , label='Difference' )
+diff_mean = np.mean([i for i in diff if i > 0])
+diff_mean_plot = [diff_mean for i in xrange(1000)]
+#plt.plot(X, diff_mean_plot, label='Average Difference', ls='--')
+max_diff = [max([i for i in diff if i >0]) for i in xrange(1000)]
+#plt.plot( X, max_diff, label="Maximum Difference", ls='-.')
+#plt.plot( X, [0 for i in xrange(1000)], c='k', ls=':')
+print 'Max: {}'.format( max_diff[0] )
+print 'Average: {}'.format( diff_mean )
+print 'SR Mean: {}'.format( SR_mean )
+print 'MR Mean: {}'.format( MR_mean )
 
 ax = plt.gca()
 plt.xticks(np.arange(min(X), max(X), 0.1) )
 ax.set_xlim([0.0, 0.95])
 ax.invert_xaxis() 
-ax.set_ylim([0.6,0.85])
+ax.set_ylim([0.60, .85])
 #ax.fill_between(X, SR_plus, SR_minus, alpha=0.5 )
 #ax.fill_between(X, MR_plus, MR_minus, alpha=0.5)
 
-plt.title('Accuracies of Single vs. Multiple Reads', fontsize=18)
-plt.xlabel('Chunk Cutoff', fontsize=14)
+#plt.title('Improvement of Multiple Reads over Single Reads', fontsize=18)
+plt.title('Accuracy of Single vs. Multiple Reads')
+plt.xlabel('Read Cutoff', fontsize=14)
 plt.ylabel('Accuracy', fontsize=14)
 plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
           ncol=2, fancybox=True, shadow=True)
-plt.show()
-#plt.savefig('/Users/Jvivian/Desktop/Accuracy_MR_SR.png', dpi=300)
+#plt.show()
+
+plt.savefig('/Users/Jvivian/Desktop/Accuracy_MR_SR.svg', dpi=300)
