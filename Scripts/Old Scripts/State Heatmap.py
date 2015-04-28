@@ -16,7 +16,7 @@ total_diff = []
 dist = {}
 
 ## Read in data to a DataFrame
-data = pd.read_excel( '../Profile/CCGG.xlsx', 'SSp')
+data = pd.read_excel( '../../../iPython/CCGG.xlsx', 'Sheet2')
 
 ## Split DataFrames by label and store the means of each as a Series
 for name, frame in data.groupby( 'label' ):
@@ -33,12 +33,9 @@ for item in total:
     total_diff.append( abs( np.max(item) - np.min(item) ) )
     
 ## Assemble Final DataFrame
-df = pd.DataFrame( [ C_mC[:18], mC_hmC[:18], C_hmC[:18], total_diff[:18] ] )   # Context
+df = pd.DataFrame( [ C_mC[:16], mC_hmC[:16], C_hmC[:16] ] )#, total_diff[:16] ] )   # Context
 
 # Test Plot
-df = [[ 0.88235294,  0.,          0.11764706]
- [ 0.66666667,  0.33333333,  0.        ]
- [ 0.23076923,  0.,          0.76923077]]
 
 
 ## Plotting
@@ -53,7 +50,7 @@ ax.invert_yaxis()
 plt.xticks(rotation=50)
 
 # Labels
-row_labels = ['C_mC', 'mC_hmC', 'C_hmC', 'Max $\Delta$ ']
+row_labels = ['C_mC', 'mC_hmC', 'C_hmC']#, 'Max $\Delta$ ']
 column_labels = data.columns[1:19]     # Context
 #column_labels = data.columns[11:]       # Label
 column_labels = [x.replace('.1','').replace('.2','') for x in column_labels]
@@ -67,8 +64,8 @@ plt.title( 'State Importance' )
 
 cb = plt.colorbar()
 cb.set_label('Absolute Mean Difference', labelpad=20, fontsize='16')
-plt.show()
-
+#plt.show()
+plt.savefig('/Users/Jvivian/Desktop/Heatmap.svg', dpi=300)
 '''
 Change-Log (Semantic Versioning:  Major-Minor-Patch)
 
