@@ -1,8 +1,11 @@
+from matplotlib import use
+use('SVG')
 import sys, os, random, argparse
 import numpy as np
 import Methods
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 
 parser = argparse.ArgumentParser(description='Can run either simple or substep model')
 parser.add_argument('-s','--substep', action='store_true', help='Imports substep model instead of simple')
@@ -43,8 +46,12 @@ indices = { state.name: i for i, state in enumerate( model.states ) }
 
 # Rank Events by CHUNK Score
 ranked_events = {}
-for i in xrange(10):
+cscores = []
+for i in xrange(1000):
     ranked_events[i] = []
+    cscores.append(i*.001)
+
+cscores = cscores[::-1]
 
 print 'Ranking Events by CHUNK Score'
 counter = 0
@@ -72,10 +79,10 @@ for event_name in events:
         max_c = max( [ x[0] for x in contexts ] ) 
         max_l = max( [ x[0] for x in labels ] )
         
-        for i in xrange(9,-1,-1):
-            if max_c >= i*.10:# and max_l >= i*.10:
-                C = [ x for x in contexts if x[0] >= i*.10 ]
-                L = [ x for x in labels if x[0] >= i*.10 ]
+        for i in xrange(999,-1,-1):
+            if max_c >= i*.001:# and max_l >= i*.10:
+                C = [ x for x in contexts if x[0] >= i*.001 ]
+                L = [ x for x in labels if x[0] >= i*.001 ]
 
                 sys.stdout.write( 'C:{}\t\tPercentage:{}%\r'.format(round(max_c,2), round((counter*1.0/len(events))*100,2)))
                 sys.stdout.flush()
@@ -89,14 +96,14 @@ for event_name in events:
 
 
 print '# of Events: {}'.format( len(ranked_events) )
-data = { 'data_sr': np.zeros( (10, 12) ), 'data_mr': np.zeros( (10, 12) ) }
+data = { 'data_sr': np.zeros( (1000, 12) ), 'data_mr': np.zeros( (1000, 12) ) }
 
-for i in ranked_events:
-    print i, len(ranked_events[i])
+#for i in ranked_events:
+    #print i, len(ranked_events[i])
 
-
-## Iterate through the range of cutoff values: 
-cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
+## Iterate through the range of cutoff values:
+#cscores = [ 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
+cscores = cscores[5:]
 data_counter = 0
 for cscore in cscores:
    
@@ -117,7 +124,7 @@ for cscore in cscores:
     ## For a given cscore, group and iterate through.
     event_sum = 0
 
-    for event in ranked_events[int(cscore*10)]:
+    for event in ranked_events[int(cscore*1000)]:
     
         # Unpack Variables
         event_name = event[0]
@@ -187,7 +194,7 @@ for cscore in cscores:
             run_methods(bins_sr, confusion['cm_sr'], cm_sr_counter)
             counter_sr += 1
     
-    print '# of MR events:{}\t# of SR events:{}\tcsore:{}'.format( counter_mr, counter_sr, cscore )
+    #print '# of MR events:{}\t# of SR events:{}\tcsore:{}'.format( counter_mr, counter_sr, cscore )
     j = data_counter
     for i in data:
         if i == 'data_mr':
@@ -207,9 +214,9 @@ for cscore in cscores:
             ## CM
             for i in xrange(3):
                 confusion['cm_mr'][i] /= cm_mr_counter[i]
-            print '-=Multi-Read Confusion Matrix=-'
-            print 'C:{}\tmC:{}\thmC:{}'.format( cm_mr_counter[0], cm_mr_counter[1], cm_mr_counter[2] )
-            print 'C\tmC\thmC\n{}'.format( confusion['cm_mr'] )
+            #print '-=Multi-Read Confusion Matrix=-'
+            #print 'C:{}\tmC:{}\thmC:{}'.format( cm_mr_counter[0], cm_mr_counter[1], cm_mr_counter[2] )
+            #print 'C\tmC\thmC\n{}'.format( confusion['cm_mr'] )
             
         else:
             data[i][j][0] = bins_sr['f']*1.0 / counter_sr
@@ -226,16 +233,34 @@ for cscore in cscores:
             data[i][j][11] = np.mean(soft_calls['i'])
             
             ## CM
+
             for i in xrange(3):
                confusion['cm_sr'][i] /= cm_sr_counter[i]
             #print cm_sr_counter, '\n', confusion['cm_sr']
-            print '-=Single-Read Confusion Matrix=-'
-            print 'C:{}\tmC:{}\thmC:{}'.format( cm_sr_counter[0], cm_sr_counter[1], cm_sr_counter[2] )
-            print 'C\tmC\thmC\n{}'.format( confusion['cm_sr'] )
-            
+            #print '-=Single-Read Confusion Matrix=-'
+            #print 'C:{}\tmC:{}\thmC:{}'.format( cm_sr_counter[0], cm_sr_counter[1], cm_sr_counter[2] )
+            #print 'C\tmC\thmC\n{}'.format( confusion['cm_sr'] )
+
     data_counter += 1
-    
-    
+
+def rolling_average(X):
+    '''takes in list and returns list after performing rolling average '''
+    new_X = []
+    std = []
+    window = 15
+    start = -window/2
+    end = window/2
+    for i in xrange(len(X)):
+        if start < 0:
+            new_X.append( np.mean( [x for x in X[0:end] if x!=0 ] ) )
+            std.append( np.std( [x for x in X[0:end] if x!=0 ] ) )
+            start, end = start+1, end+1
+        else:
+            new_X.append( np.mean( [x for x in X[start:end] if x!=0] ) )
+            std.append( np.std( [x for x in X[start:end] if x!=0 ] ) )
+            start, end = start+1, end+1
+
+    return new_X, std
     
 def accuracy_by_filter_score( data, title, sc=False ):
     
@@ -244,7 +269,7 @@ def accuracy_by_filter_score( data, title, sc=False ):
     hmm, best, ind = [], [], []
     sample_sizes = []
     
-    for j in xrange(0,10):
+    for j in xrange(0,995):
             
             #trial = np.loadtxt( '../Data/Results/' + trial_name, delimiter = ',' )
             #accuracies = means[::2]
@@ -270,7 +295,11 @@ def accuracy_by_filter_score( data, title, sc=False ):
     #plt.plot( x, first, label='First', ls='--', c='k', lw=1)
     #plt.plot( x, last, label='Last', ls='--', c='c', lw=1)
     #plt.plot( x, random, label='Random', ls='--', c='m', lw=1 )
-    
+
+    hmm, hmm_std = rolling_average(hmm)
+    best, best_std = rolling_average(best)
+    ind, ind_std = rolling_average(ind)
+
     plt.plot( x, hmm, label='HMM')#, c='y', lw=1 )
     plt.plot( x, best, label='Best')#, lw=1, c='r' )
     plt.plot( x, ind, label='Ind')#, lw=1, c='b')
@@ -279,14 +308,18 @@ def accuracy_by_filter_score( data, title, sc=False ):
     #            + ' - ' + trial_name.split('_')[2], fontsize=14 )
     
     plt.title( title, fontsize=18 )
-    plt.xlabel( 'Chunk Score Cutoff', fontsize=14 )
+    plt.xlabel( 'Read Cutoff', fontsize=14 )
     plt.ylabel( 'Accuracy', fontsize=14 )
+    plt.xlim([0.0, .95])
     plt.ylim( [0.5,0.85] )
     plt.legend(loc=8, bbox_to_anchor=(0.5, 0.0),
           ncol=2, fancybox=True, shadow=True)
     plt.gca().invert_xaxis()
-    #plt.show()
-    plt.savefig( '/Users/Jvivian/Desktop/MR.png', dpi=300)
+    print 'plt.show'
+    plt.show()
+    plt.savefig( '/Users/Jvivian/Desktop/MR.svg', dpi=300)
     
-#accuracy_by_filter_score( data['data_sr'], 'Single Reads: Alpha=1.5' )
+
+print 'accuracy'
 accuracy_by_filter_score( data['data_mr'], 'Accuracy of Multi-Read Methods' )
+#accuracy_by_filter_score( data['data_sr'], 'Single Reads: Alpha=1.5' )
